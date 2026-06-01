@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { PaymentStatus } from '@prisma/client'
+import { sendManualReviewEmail, sendPaymentSuccessEmail } from '@/lib/notifications/email'
 
 export class PaymentRepository {
   /**
@@ -94,7 +95,7 @@ export class PaymentRepository {
     await prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({
         where: { id: payment.orderId },
-        include: { items: true }
+        include: { items: true, user: true }
       })
 
       if (!order) throw new Error('Order not found')
@@ -118,6 +119,8 @@ export class PaymentRepository {
             where: { id: order.id },
             data: { status: 'MANUAL_REVIEW' }
           })
+          
+          sendManualReviewEmail(order, order.user.email || '', order.userId)
         } else {
           // Sufficient Stock -> Decrement stock & mark Order Payment Received
           for (const item of order.items) {
@@ -130,6 +133,8 @@ export class PaymentRepository {
             where: { id: order.id },
             data: { status: 'PAYMENT_RECEIVED' }
           })
+
+          sendPaymentSuccessEmail(order, order.user.email || '', order.userId)
         }
       } else {
         // Terminal Failure (EXPIRED, CANCELLED, FAILED)

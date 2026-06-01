@@ -5,6 +5,7 @@ import { auth } from '@/auth'
 import { orderRepository, CreateOrderInput } from '@/lib/repositories/order.repository'
 import { logAuditAction } from '@/lib/audit'
 import { DeliveryMethod } from '@prisma/client'
+import { sendOrderCreatedEmail } from '@/lib/notifications/email'
 
 export async function createOrderFromCartAction(formData: FormData) {
   try {
@@ -43,6 +44,8 @@ export async function createOrderFromCartAction(formData: FormData) {
       entityType: 'Cart',
       entityId: session.user.id
     })
+
+    sendOrderCreatedEmail(order, session.user.email as string, session.user.id)
 
     revalidatePath('/cart')
     revalidatePath('/checkout')

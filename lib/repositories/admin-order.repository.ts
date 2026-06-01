@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { OrderStatus } from '@prisma/client'
+import { sendOrderStatusUpdatedEmail, sendOrderCancelledEmail, sendShippingReceiptUpdatedEmail } from '@/lib/notifications/email'
 
 export class AdminOrderRepository {
   /**
@@ -87,10 +88,11 @@ export class AdminOrderRepository {
     }
 
     // Execute update and log audit
-    return prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const updatedOrder = await tx.order.update({
         where: { id },
-        data: { status: newStatus }
+        data: { status: newStatus },
+        include: { user: true }
       })
 
       let auditAction = 'ORDER_STATUS_UPDATED'
@@ -109,6 +111,14 @@ export class AdminOrderRepository {
 
       return updatedOrder
     })
+
+    if (newStatus === 'CANCELLED') {
+      sendOrderCancelledEmail(result, result.user.email || '', result.userId)
+    } else {
+      sendOrderStatusUpdatedEmail(result, result.user.email || '', result.userId, newStatus)
+    }
+
+    return result
   }
 
   /**
@@ -133,13 +143,14 @@ export class AdminOrderRepository {
       throw new Error('Order must be READY_TO_SHIP or SHIPPED to add receipt')
     }
 
-    return prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const updatedOrder = await tx.order.update({
         where: { id },
         data: { 
           shippingReceipt: receiptNumber,
           status: newStatus
-        }
+        },
+        include: { user: true }
       })
 
       await tx.auditLog.create({
@@ -154,6 +165,10 @@ export class AdminOrderRepository {
 
       return updatedOrder
     })
+
+    sendShippingReceiptUpdatedEmail(result, result.user.email || '', result.userId, receiptNumber)
+
+    return result
   }
 }
 
