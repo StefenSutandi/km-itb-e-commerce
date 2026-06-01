@@ -41,7 +41,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
               />
             </div>
             <div className="flex gap-3">
-              {product.images.map((image, idx) => (
+              {product.images.map((image: any, idx: any) => (
                 <button
                   key={idx}
                   onClick={() => setSelectedImage(idx)}
@@ -126,7 +126,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                 disabled={selectedVariant.stock === 0}
                 className="w-full rounded-full bg-black hover:bg-gray-900 text-white font-semibold py-6"
               >
-                Add to Cart
+                Add to UICart
               </Button>
               <Button
                 variant="outline"

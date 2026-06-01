@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import { Product } from '@/lib/types'
+import { UIProduct } from "@/lib/ui-types"
 import { formatCurrency } from '@/lib/format'
 import { Button } from '@/components/ui/button'
 
 interface ProductCardProps {
-  product: Product
+  product: UIProduct
 }
 
 export function ProductCard({ product }: ProductCardProps) {

@@ -7,12 +7,12 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const productVariants = mockVariants.filter((v) => v.productId === params.id)
 
   if (!product) {
-    return <div>Product not found</div>
+    return <div>UIProduct not found</div>
   }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-light">Edit Product</h1>
+      <h1 className="text-3xl font-light">Edit UIProduct</h1>
 
       <Card className="p-6 border-gray-200">
         <form className="space-y-6">
@@ -20,7 +20,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Basic Information</h2>
             <div>
-              <label className="block text-sm font-medium mb-2">Product Name</label>
+              <label className="block text-sm font-medium mb-2">UIProduct Name</label>
               <input
                 type="text"
                 defaultValue={product.name}

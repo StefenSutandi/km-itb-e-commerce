@@ -26,7 +26,7 @@ export default function CheckoutPage() {
     if (voucherCode === 'WELCOME10') {
       setAppliedVoucher({ code: voucherCode, discount: 50000 })
     } else {
-      alert('Voucher code not found')
+      alert('UIVoucher code not found')
     }
   }
 
@@ -121,7 +121,7 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            {/* Voucher */}
+            {/* UIVoucher */}
             <div className="space-y-4">
               <h2 className="text-2xl font-light">Promo Code</h2>
               <div className="flex gap-2">
@@ -142,7 +142,7 @@ export default function CheckoutPage() {
               </div>
               {appliedVoucher && (
                 <p className="text-green-600 text-sm font-medium">
-                  Voucher applied: {appliedVoucher.code}
+                  UIVoucher applied: {appliedVoucher.code}
                 </p>
               )}
             </div>
@@ -158,7 +158,7 @@ export default function CheckoutPage() {
               total={total}
               onCheckout={() => {
                 // TODO: Call order creation API
-                alert('Order created! Redirecting to payment...')
+                alert('UIOrder created! Redirecting to payment...')
               }}
             />
           </div>

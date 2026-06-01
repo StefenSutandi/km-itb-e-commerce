@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { ApiResponse, PaymentTransaction } from '@/lib/types'
+import { UIApiResponse, PaymentTransaction } from '@/lib/ui-types'
 import { PaymentService, MockMidtransGateway } from '@/lib/services/payment.service'
 import { getMockRepository } from '@/lib/repositories/mock.repository'
 
@@ -53,12 +53,12 @@ export async function POST(request: NextRequest) {
     // }
 
     // Initialize services
-    const mockRepo = getMockRepository()
+    const mockRepo = getMockRepository() as any
     const paymentService = new PaymentService(mockRepo, new MockMidtransGateway())
 
     // Get order from database
     // TODO: Fetch order from real database instead of mock repo
-    const order = await mockRepo.getById(orderId)
+    const order = await mockRepo.getOrderById(orderId)
     if (!order) {
       return NextResponse.json(
         {
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
 
     // Check order is in WAITING_PAYMENT status
     // TODO: Validate order status is WAITING_PAYMENT
-    // if (order.status !== OrderStatus.WAITING_PAYMENT) {
+    // if (order.status !== UIOrderStatus.WAITING_PAYMENT) {
     //   return NextResponse.json(
     //     {
     //       success: false,
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     // TODO: Store payment transaction in real database
     // const savedPayment = await db.paymentTransactions.create({ data: payment })
 
-    const response: ApiResponse<{
+    const response: UIApiResponse<{
       payment: PaymentTransaction
       redirectUrl: string
       token: string
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[v0] Midtrans transaction creation error:', error)
 
-    const response: ApiResponse<null> = {
+    const response: UIApiResponse<null> = {
       success: false,
       error: {
         code: 'PAYMENT_CREATION_FAILED',

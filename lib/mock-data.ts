@@ -1,6 +1,6 @@
-import { Product, ProductVariant, Order, Voucher, User } from './types'
+import { UIProduct, UIProductVariant, UIOrder, UIVoucher, UIUser } from "./ui-types"
 
-export const mockProducts: Product[] = [
+export const mockProducts: UIProduct[] = [
   {
     id: 'prod-1',
     name: 'KM ITB Premium Hoodie',
@@ -11,7 +11,7 @@ export const mockProducts: Product[] = [
     category: 'APPAREL',
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-05-01'),
-    status: 'ACTIVE',
+    
   },
   {
     id: 'prod-2',
@@ -23,7 +23,7 @@ export const mockProducts: Product[] = [
     category: 'APPAREL',
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-05-01'),
-    status: 'ACTIVE',
+    
   },
   {
     id: 'prod-3',
@@ -35,7 +35,7 @@ export const mockProducts: Product[] = [
     category: 'ACCESSORIES',
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-05-01'),
-    status: 'ACTIVE',
+    
   },
   {
     id: 'prod-4',
@@ -47,7 +47,7 @@ export const mockProducts: Product[] = [
     category: 'APPAREL',
     createdAt: new Date('2024-02-01'),
     updatedAt: new Date('2024-05-01'),
-    status: 'ACTIVE',
+    
   },
   {
     id: 'prod-5',
@@ -59,7 +59,7 @@ export const mockProducts: Product[] = [
     category: 'ACCESSORIES',
     createdAt: new Date('2024-02-01'),
     updatedAt: new Date('2024-05-01'),
-    status: 'ACTIVE',
+    
   },
   {
     id: 'prod-6',
@@ -71,7 +71,7 @@ export const mockProducts: Product[] = [
     category: 'ACCESSORIES',
     createdAt: new Date('2024-02-15'),
     updatedAt: new Date('2024-05-01'),
-    status: 'ACTIVE',
+    
   },
   {
     id: 'prod-7',
@@ -83,7 +83,7 @@ export const mockProducts: Product[] = [
     category: 'MERCHANDISE',
     createdAt: new Date('2024-03-01'),
     updatedAt: new Date('2024-05-01'),
-    status: 'ACTIVE',
+    
   },
   {
     id: 'prod-8',
@@ -95,11 +95,11 @@ export const mockProducts: Product[] = [
     category: 'MERCHANDISE',
     createdAt: new Date('2024-03-01'),
     updatedAt: new Date('2024-05-01'),
-    status: 'ACTIVE',
+    
   },
 ]
 
-export const mockVariants: ProductVariant[] = [
+export const mockVariants: UIProductVariant[] = [
   // Hoodie variants
   {
     id: 'var-1',
@@ -272,7 +272,7 @@ export const mockVariants: ProductVariant[] = [
   },
 ]
 
-export const mockVouchers: Voucher[] = [
+export const mockVouchers: UIVoucher[] = [
   {
     id: 'vouch-1',
     code: 'WELCOME10',
@@ -283,7 +283,8 @@ export const mockVouchers: Voucher[] = [
     usageCount: 0,
     minPurchaseAmount: 100000,
     expiresAt: new Date('2024-12-31'),
-    status: 'ACTIVE',
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
     id: 'vouch-2',
@@ -295,11 +296,12 @@ export const mockVouchers: Voucher[] = [
     usageCount: 0,
     minPurchaseAmount: 200000,
     expiresAt: new Date('2024-12-31'),
-    status: 'ACTIVE',
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
 ]
 
-export const mockUsers: User[] = [
+export const mockUsers: UIUser[] = [
   {
     id: 'user-1',
     email: 'budi@example.com',
@@ -308,7 +310,7 @@ export const mockUsers: User[] = [
     role: 'BUYER',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-05-01'),
-  },
+      },
   {
     id: 'user-2',
     email: 'admin@km-itb.com',
@@ -317,10 +319,10 @@ export const mockUsers: User[] = [
     role: 'ADMIN',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-05-01'),
-  },
+      },
 ]
 
-export const mockOrders: Order[] = [
+export const mockOrders: UIOrder[] = [
   {
     id: 'order-1',
     orderNumber: 'KM-20240501-ABC123',
@@ -341,9 +343,9 @@ export const mockOrders: Order[] = [
     shippingCost: 50000,
     discountAmount: 0,
     total: 378900,
-    deliveryMethod: 'DELIVERY',
-    status: 'PAYMENT_RECEIVED',
-    paymentStatus: 'PAID',
+    deliveryMethod: 'DELIVERY' as any, // TODO: Replace with proper enum in Phase 2
+    status: 'PAYMENT_RECEIVED' as any, // TODO: Replace with proper enum in Phase 2
+    paymentStatus: 'PAID' as any, // TODO: Replace with proper enum in Phase 2
     createdAt: new Date('2024-05-01'),
     updatedAt: new Date('2024-05-02'),
   },
@@ -376,9 +378,9 @@ export const mockOrders: Order[] = [
     shippingCost: 0,
     discountAmount: 0,
     total: 381700,
-    deliveryMethod: 'PICKUP',
-    status: 'WAITING_PAYMENT',
-    paymentStatus: 'PENDING',
+    deliveryMethod: 'PICKUP' as any, // TODO: Replace with proper enum in Phase 2
+    status: 'WAITING_PAYMENT' as any, // TODO: Replace with proper enum in Phase 2
+    paymentStatus: 'PENDING' as any, // TODO: Replace with proper enum in Phase 2
     createdAt: new Date('2024-05-02'),
     updatedAt: new Date('2024-05-02'),
   },

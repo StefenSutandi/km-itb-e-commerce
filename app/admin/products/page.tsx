@@ -18,7 +18,7 @@ export default function AdminProductsPage() {
         <Link href="/admin/products/new">
           <Button className="rounded-full bg-accent hover:bg-accent text-black gap-2">
             <Plus className="w-4 h-4" />
-            Add Product
+            Add UIProduct
           </Button>
         </Link>
       </div>
@@ -29,7 +29,7 @@ export default function AdminProductsPage() {
           <table className="w-full text-sm">
             <thead className="border-b border-gray-200 bg-gray-50">
               <tr>
-                <th className="text-left py-4 px-6 font-semibold">Product</th>
+                <th className="text-left py-4 px-6 font-semibold">UIProduct</th>
                 <th className="text-left py-4 px-6 font-semibold">Category</th>
                 <th className="text-left py-4 px-6 font-semibold">Price</th>
                 <th className="text-left py-4 px-6 font-semibold">Status</th>

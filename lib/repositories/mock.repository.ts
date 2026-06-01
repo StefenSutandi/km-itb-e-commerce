@@ -1,11 +1,11 @@
 import {
-  Order,
-  Product,
-  ProductVariant,
+  UIOrder,
+  UIProduct,
+  UIProductVariant,
   PaymentTransaction,
-  Voucher,
-  User,
-} from '@/lib/types'
+  UIVoucher,
+  UIUser,
+} from "@/lib/ui-types"
 import { IOrderRepository } from '@/lib/services/order.service'
 import { IProductRepository } from '@/lib/services/order.service'
 import { IVoucherRepository } from '@/lib/services/order.service'
@@ -19,14 +19,14 @@ import { IPaymentRepository } from '@/lib/services/payment.service'
 export class MockRepository
   implements IOrderRepository, IProductRepository, IVoucherRepository, IPaymentRepository
 {
-  private orders: Map<string, Order> = new Map()
+  private orders: Map<string, UIOrder> = new Map()
   private ordersByUser: Map<string, string[]> = new Map()
-  private products: Map<string, Product> = new Map()
-  private variants: Map<string, ProductVariant> = new Map()
+  private products: Map<string, UIProduct> = new Map()
+  private variants: Map<string, UIProductVariant> = new Map()
   private payments: Map<string, PaymentTransaction> = new Map()
   private paymentsByOrder: Map<string, string> = new Map()
   private paymentsByExternal: Map<string, string> = new Map()
-  private vouchers: Map<string, Voucher> = new Map()
+  private vouchers: Map<string, UIVoucher> = new Map()
 
   constructor() {
     this.initializeMockData()
@@ -36,7 +36,7 @@ export class MockRepository
   // ORDER REPOSITORY
   // ============================================================================
 
-  async create(order: Order): Promise<Order> {
+  async createOrder(order: UIOrder): Promise<UIOrder> {
     this.orders.set(order.id, order)
 
     if (!this.ordersByUser.has(order.userId)) {
@@ -47,11 +47,11 @@ export class MockRepository
     return order
   }
 
-  async getById(id: string): Promise<Order | null> {
+  async getOrderById(id: string): Promise<UIOrder | null> {
     return this.orders.get(id) || null
   }
 
-  async getByOrderNumber(orderNumber: string): Promise<Order | null> {
+  async getByOrderNumber(orderNumber: string): Promise<UIOrder | null> {
     for (const order of this.orders.values()) {
       if (order.orderNumber === orderNumber) {
         return order
@@ -60,26 +60,26 @@ export class MockRepository
     return null
   }
 
-  async getByUserId(userId: string, limit: number = 20, offset: number = 0): Promise<Order[]> {
+  async getByUserId(userId: string, limit: number = 20, offset: number = 0): Promise<UIOrder[]> {
     const orderIds = this.ordersByUser.get(userId) || []
     const orders = orderIds.map((id) => this.orders.get(id)!).filter(Boolean)
 
     // Sort by created date descending
-    orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    orders.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
 
     return orders.slice(offset, offset + limit)
   }
 
-  async getAll(limit: number = 50, offset: number = 0): Promise<Order[]> {
+  async getAll(limit: number = 50, offset: number = 0): Promise<UIOrder[]> {
     const orders = Array.from(this.orders.values())
-    orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    orders.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
     return orders.slice(offset, offset + limit)
   }
 
-  async update(id: string, updates: Partial<Order>): Promise<Order> {
+  async updateOrder(id: string, updates: Partial<UIOrder>): Promise<UIOrder> {
     const order = this.orders.get(id)
     if (!order) {
-      throw new Error(`Order not found: ${id}`)
+      throw new Error(`UIOrder not found: ${id}`)
     }
 
     const updated = { ...order, ...updates }
@@ -87,10 +87,10 @@ export class MockRepository
     return updated
   }
 
-  async updateStatus(id: string, status: any): Promise<Order> {
+  async updateStatus(id: string, status: any): Promise<UIOrder> {
     const order = this.orders.get(id)
     if (!order) {
-      throw new Error(`Order not found: ${id}`)
+      throw new Error(`UIOrder not found: ${id}`)
     }
 
     order.status = status
@@ -120,11 +120,11 @@ export class MockRepository
   // PRODUCT REPOSITORY
   // ============================================================================
 
-  async getById(id: string): Promise<Product | null> {
+  async getProductById(id: string): Promise<UIProduct | null> {
     return this.products.get(id) || null
   }
 
-  async getVariantById(variantId: string): Promise<ProductVariant | null> {
+  async getVariantById(variantId: string): Promise<UIProductVariant | null> {
     return this.variants.get(variantId) || null
   }
 
@@ -132,7 +132,7 @@ export class MockRepository
   // VOUCHER REPOSITORY
   // ============================================================================
 
-  async getByCode(code: string): Promise<Voucher | null> {
+  async getByCode(code: string): Promise<UIVoucher | null> {
     for (const voucher of this.vouchers.values()) {
       if (voucher.code === code.toUpperCase()) {
         return voucher
@@ -144,7 +144,7 @@ export class MockRepository
   async incrementUsage(voucherId: string): Promise<void> {
     const voucher = this.vouchers.get(voucherId)
     if (voucher) {
-      voucher.currentUsage += 1
+      voucher.usageCount += 1
       this.vouchers.set(voucherId, voucher)
     }
   }
@@ -153,7 +153,7 @@ export class MockRepository
   // PAYMENT REPOSITORY
   // ============================================================================
 
-  async create(transaction: PaymentTransaction): Promise<PaymentTransaction> {
+  async createPayment(transaction: PaymentTransaction): Promise<PaymentTransaction> {
     this.payments.set(transaction.id, transaction)
     this.paymentsByOrder.set(transaction.orderId, transaction.id)
 
@@ -164,7 +164,7 @@ export class MockRepository
     return transaction
   }
 
-  async getById(id: string): Promise<PaymentTransaction | null> {
+  async getPaymentById(id: string): Promise<PaymentTransaction | null> {
     return this.payments.get(id) || null
   }
 
@@ -178,7 +178,7 @@ export class MockRepository
     return paymentId ? this.payments.get(paymentId) || null : null
   }
 
-  async update(id: string, updates: Partial<PaymentTransaction>): Promise<PaymentTransaction> {
+  async updatePayment(id: string, updates: Partial<PaymentTransaction>): Promise<PaymentTransaction> {
     const payment = this.payments.get(id)
     if (!payment) {
       throw new Error(`Payment not found: ${id}`)
@@ -195,15 +195,15 @@ export class MockRepository
 
   private initializeMockData(): void {
     // Create mock products
-    const products: Product[] = [
+    const products: UIProduct[] = [
       {
         id: 'prod-1',
         name: 'KM ITB Official Hoodie',
         description: 'Premium quality hoodie with KM ITB embroidery',
         slug: 'km-itb-hoodie',
         category: 'Apparel',
-        basePrice: 350000,
-        image: '/products/hoodie.jpg',
+        price: 350000,
+        images: ['/products/hoodie.jpg'],
         isFeatured: true,
         isActive: true,
         createdAt: new Date('2024-01-01'),
@@ -216,8 +216,8 @@ export class MockRepository
         description: 'Comfortable cotton t-shirt with KM ITB logo',
         slug: 'km-itb-tshirt',
         category: 'Apparel',
-        basePrice: 150000,
-        image: '/products/tshirt.jpg',
+        price: 150000,
+        images: ['/products/tshirt.jpg'],
         isFeatured: true,
         isActive: true,
         createdAt: new Date('2024-01-01'),
@@ -230,8 +230,8 @@ export class MockRepository
         description: 'Adjustable cap with embroidered logo',
         slug: 'km-itb-cap',
         category: 'Accessories',
-        basePrice: 100000,
-        image: '/products/cap.jpg',
+        price: 100000,
+        images: ['/products/cap.jpg'],
         isFeatured: false,
         isActive: true,
         createdAt: new Date('2024-01-01'),
@@ -243,7 +243,7 @@ export class MockRepository
     products.forEach((product) => this.products.set(product.id, product))
 
     // Create mock variants
-    const variants: ProductVariant[] = [
+    const variants: UIProductVariant[] = [
       {
         id: 'var-1',
         productId: 'prod-1',
@@ -315,7 +315,7 @@ export class MockRepository
     variants.forEach((variant) => this.variants.set(variant.id, variant))
 
     // Create mock vouchers
-    const vouchers: Voucher[] = [
+    const vouchers: UIVoucher[] = [
       {
         id: 'voucher-1',
         code: 'WELCOME10',
@@ -323,7 +323,7 @@ export class MockRepository
         discountType: 'PERCENTAGE',
         discountValue: 10,
         maxUsage: 100,
-        currentUsage: 25,
+        usageCount: 25,
         minPurchaseAmount: 100000,
         isActive: true,
         expiresAt: new Date('2024-12-31'),
@@ -337,7 +337,7 @@ export class MockRepository
         discountType: 'FIXED',
         discountValue: 50000,
         maxUsage: 50,
-        currentUsage: 10,
+        usageCount: 10,
         minPurchaseAmount: 300000,
         maxDiscountAmount: 50000,
         isActive: true,

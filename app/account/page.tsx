@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { User, ShoppingBag, Settings, LogOut } from 'lucide-react'
+import { User as UIUserIcon, Package, MapPin, Heart, Bell, Settings, LogOut, ChevronRight, ShoppingBag } from 'lucide-react'
 
 export default function AccountPage() {
   const user = {
@@ -39,7 +39,7 @@ export default function AccountPage() {
             <div className="flex items-start justify-between mb-6">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center">
-                  <User className="w-8 h-8 text-white" />
+                  <UIUserIcon className="w-8 h-8 text-white" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-semibold">{user.name}</h2>

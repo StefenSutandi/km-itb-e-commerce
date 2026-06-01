@@ -1,0 +1,377 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth Required Models
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String  @map("user_id")
+  type               String
+  provider           String
+  providerAccountId  String  @map("provider_account_id")
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model User {
+  id               String       @id @default(cuid())
+  name             String?
+  email            String?      @unique
+  emailVerified    DateTime?    @map("email_verified")
+  image            String?
+  
+  // Custom Profile Fields
+  role             UserRole     @default(BUYER)
+  userType         UserType?
+  waNumber         String?
+  profileCompleted Boolean      @default(false)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  accounts         Account[]
+  sessions         Session[]
+  addresses        Address[]
+  carts            Cart[]
+  orders           Order[]
+  subsidyRequests  SubsidyRequest[]
+
+  @@map("users")
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  userId     String
+  street     String
+  district   String
+  city       String
+  province   String
+  postalCode String
+  isDefault  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("addresses")
+}
+
+enum UserRole {
+  BUYER
+  ADMIN
+  SUPERADMIN
+}
+
+enum UserType {
+  MAHASISWA
+  UMUM
+}
+
+// Product Domain
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String   @db.Text
+  material    String?
+  sizeChart   String?  @db.Text
+  status      ProductStatus @default(DRAFT)
+  category    ProductCategory
+  isLottery   Boolean  @default(false)
+  lotteryInfo String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  images      ProductImage[]
+  variants    ProductVariant[]
+
+  @@map("products")
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  url       String
+  isPrimary Boolean  @default(false)
+  order     Int      @default(0)
+
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+}
+
+model ProductVariant {
+  id          String   @id @default(cuid())
+  productId   String
+  sku         String   @unique
+  name        String   // e.g. "L", "XL", "Red - M"
+  price       Decimal  @db.Decimal(12, 2)
+  stock       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+
+  @@map("product_variants")
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  PRE_ORDER
+  READY_STOCK
+  SOLD_OUT
+  POP_UP_ONLY
+}
+
+enum ProductCategory {
+  OFFICIAL_ITB
+  KM_ITB
+  EVENT_POPUP
+}
+
+// Cart Domain
+model Cart {
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  variantId String
+  quantity  Int
+
+  cart      Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  @@unique([cartId, variantId])
+  @@map("cart_items")
+}
+
+// Order & Payment Domain
+model Order {
+  id             String   @id @default(cuid())
+  orderNumber    String   @unique
+  userId         String
+  status         OrderStatus @default(WAITING_PAYMENT)
+  subtotal       Decimal  @db.Decimal(12, 2)
+  buyerFee       Decimal  @db.Decimal(12, 2)
+  deliveryFee    Decimal  @db.Decimal(12, 2)
+  discount       Decimal  @db.Decimal(12, 2) @default(0)
+  total          Decimal  @db.Decimal(12, 2)
+  
+  deliveryMethod DeliveryMethod
+  shippingName   String?
+  shippingPhone  String?
+  shippingStreet String?
+  shippingDistrict String?
+  shippingCity   String?
+  shippingProvince String?
+  shippingPostal String?
+  shippingReceipt String?
+
+  pickupQrCode   String?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  items          OrderItem[]
+  payments       PaymentTransaction[]
+  invoices       Invoice[]
+  subsidyRequest SubsidyRequest?
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  variantId String
+  quantity  Int
+  price     Decimal  @db.Decimal(12, 2)
+
+  order     Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  @@map("order_items")
+}
+
+model PaymentTransaction {
+  id              String   @id @default(cuid())
+  orderId         String
+  midtransId      String?  @unique
+  status          PaymentStatus @default(WAITING)
+  amount          Decimal  @db.Decimal(12, 2)
+  paymentType     String?
+  rawResponse     Json?
+  paidAt          DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payment_transactions")
+}
+
+model Invoice {
+  id        String   @id @default(cuid())
+  orderId   String
+  invoiceNo String   @unique
+  pdfUrl    String?
+  createdAt DateTime @default(now())
+
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("invoices")
+}
+
+enum OrderStatus {
+  WAITING_PAYMENT
+  PAYMENT_RECEIVED
+  PROCESSING
+  READY_FOR_PICKUP
+  READY_TO_SHIP
+  SHIPPED
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  WAITING
+  PENDING
+  SUCCESS
+  FAILED
+  EXPIRED
+  CANCELLED
+  REFUNDED
+}
+
+enum DeliveryMethod {
+  PICKUP
+  DELIVERY
+}
+
+// Subsidy Domain
+model SubsidyRequest {
+  id        String   @id @default(cuid())
+  userId    String
+  orderId   String?  @unique // Nullable until approved and attached to an order
+  type      SubsidyType
+  status    SubsidyStatus @default(WAITING_REVIEW)
+  reason    String   @db.Text
+  documentUrl String
+  
+  installmentDueDate DateTime?
+  approvedAmount     Decimal? @db.Decimal(12, 2)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order     Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  decision  SubsidyDecision?
+
+  @@map("subsidy_requests")
+}
+
+model SubsidyDecision {
+  id               String   @id @default(cuid())
+  subsidyRequestId String   @unique
+  adminId          String
+  notes            String?  @db.Text
+  createdAt        DateTime @default(now())
+
+  request          SubsidyRequest @relation(fields: [subsidyRequestId], references: [id], onDelete: Cascade)
+
+  @@map("subsidy_decisions")
+}
+
+enum SubsidyType {
+  INSTALLMENT
+  DISCOUNT
+}
+
+enum SubsidyStatus {
+  WAITING_REVIEW
+  APPROVED_INSTALLMENT
+  APPROVED_DISCOUNT
+  REJECTED
+}
+
+// Logging Domain
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  action     String
+  entityType String
+  entityId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model NotificationLog {
+  id         String   @id @default(cuid())
+  userId     String
+  type       NotificationType
+  recipient  String
+  subject    String
+  status     String   @default("SENT") // SENT, FAILED
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@map("notification_logs")
+}
+
+enum NotificationType {
+  PAYMENT_WAITING
+  PAYMENT_SUCCESS
+  ORDER_STATUS_UPDATED
+  SUBSIDY_UPDATED
+  SHIPPING_RECEIPT_UPDATED
+}

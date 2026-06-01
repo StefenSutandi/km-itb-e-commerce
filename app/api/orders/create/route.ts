@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { CreateOrderRequest, ApiResponse, Order } from '@/lib/types'
+import { UIOrder, UIOrderStatus, UIPaymentStatus, UIDeliveryMethod, UIOrderItem, UICreateOrderRequest, UIApiResponse } from "@/lib/ui-types"
 import { OrderService } from '@/lib/services/order.service'
 import { PaymentService, MockMidtransGateway } from '@/lib/services/payment.service'
 import { getMockRepository } from '@/lib/repositories/mock.repository'
@@ -11,7 +11,7 @@ import { getMockRepository } from '@/lib/repositories/mock.repository'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const req: CreateOrderRequest = body
+    const req: UICreateOrderRequest = body
 
     // TODO: Add request validation with Zod
     // const createOrderSchema = z.object({
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     // }
 
     // Initialize services with mock repository
-    const mockRepo = getMockRepository()
+    const mockRepo = getMockRepository() as any
     const orderService = new OrderService(mockRepo, mockRepo, mockRepo)
     const paymentService = new PaymentService(mockRepo, new MockMidtransGateway())
 
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     // TODO: Store order in real database here
     // const savedOrder = await db.orders.create({ data: order })
 
-    const response: ApiResponse<Order> = {
+    const response: UIApiResponse<UIOrder> = {
       success: true,
       data: order,
       timestamp: new Date(),
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[v0] Order creation error:', error)
 
-    const response: ApiResponse<null> = {
+    const response: UIApiResponse<null> = {
       success: false,
       error: {
         code: 'ORDER_CREATION_FAILED',

@@ -30,7 +30,7 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
             <Card className="p-6 border-gray-200">
               <p className="text-sm text-gray-600">Payment Status</p>
               <div className="mt-3">
-                <PaymentStatusBadge status={order.paymentStatus} />
+                <PaymentStatusBadge status={order.paymentStatus as any} />
               </div>
             </Card>
           </div>
@@ -39,7 +39,7 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
           <Card className="p-6 border-gray-200">
             <h2 className="text-xl font-semibold mb-6">Order Items</h2>
             <div className="space-y-4">
-              {order.items.map((item) => {
+              {order.items.map((item: any) => {
                 const product = mockProducts.find((p) => p.id === item.productId)
                 return (
                   <div

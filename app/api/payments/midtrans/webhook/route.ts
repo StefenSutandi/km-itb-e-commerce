@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { ApiResponse, PaymentTransaction, OrderStatus } from '@/lib/types'
+import { UIApiResponse, PaymentTransaction, UIOrderStatus } from '@/lib/ui-types'
 import { PaymentService, MockMidtransGateway } from '@/lib/services/payment.service'
 import { OrderService } from '@/lib/services/order.service'
 import { getMockRepository } from '@/lib/repositories/mock.repository'
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     // }
 
     // Initialize services
-    const mockRepo = getMockRepository()
+    const mockRepo = getMockRepository() as any
     const paymentService = new PaymentService(mockRepo, new MockMidtransGateway())
     const orderService = new OrderService(mockRepo, mockRepo, mockRepo)
 
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
     //   // Update order status to PAYMENT_RECEIVED
     //   await orderService.updateOrderStatus(
     //     payment.orderId,
-    //     OrderStatus.PAYMENT_RECEIVED,
+    //     UIOrderStatus.PAYMENT_RECEIVED,
     //   )
     //   console.log('[v0] Order status updated to PAYMENT_RECEIVED:', payment.orderId)
     //
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     // if (fraud_status === 'deny') {
     //   await orderService.updateOrderStatus(
     //     payment.orderId,
-    //     OrderStatus.CANCELLED,
+    //     UIOrderStatus.CANCELLED,
     //   )
     //   // TODO: Send fraud alert email
     // }
@@ -117,12 +117,12 @@ export async function POST(request: NextRequest) {
     // if (['deny', 'expire', 'failure'].includes(transaction_status)) {
     //   await orderService.updateOrderStatus(
     //     payment.orderId,
-    //     OrderStatus.CANCELLED,
+    //     UIOrderStatus.CANCELLED,
     //   )
     //   // TODO: Send failure notification email
     // }
 
-    const response: ApiResponse<PaymentTransaction> = {
+    const response: UIApiResponse<PaymentTransaction> = {
       success: true,
       data: payment,
       timestamp: new Date(),
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
 
     // Always return 200 OK to Midtrans even if we encountered an error
     // This prevents Midtrans from retrying the webhook
-    const response: ApiResponse<null> = {
+    const response: UIApiResponse<null> = {
       success: false,
       error: {
         code: 'WEBHOOK_PROCESSING_ERROR',

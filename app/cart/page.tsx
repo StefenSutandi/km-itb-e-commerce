@@ -35,9 +35,9 @@ export default function CartPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
-          {/* Cart Items */}
+          {/* UICart Items */}
           <div className="lg:col-span-2 space-y-6">
-            <h1 className="text-4xl font-light">Shopping Cart</h1>
+            <h1 className="text-4xl font-light">Shopping UICart</h1>
 
             {mockCartItems.length === 0 ? (
               <div className="text-center py-12">

@@ -55,7 +55,7 @@ export default function AdminOrdersPage() {
           <table className="w-full text-sm">
             <thead className="border-b border-gray-200 bg-gray-50">
               <tr>
-                <th className="text-left py-4 px-6 font-semibold">Order Number</th>
+                <th className="text-left py-4 px-6 font-semibold">UIOrder Number</th>
                 <th className="text-left py-4 px-6 font-semibold">Customer</th>
                 <th className="text-left py-4 px-6 font-semibold">Amount</th>
                 <th className="text-left py-4 px-6 font-semibold">Status</th>

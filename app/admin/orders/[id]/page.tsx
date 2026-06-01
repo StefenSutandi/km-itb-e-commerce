@@ -71,7 +71,7 @@ export default function AdminOrderDetailPage({ params }: { params: { id: string 
             <div>
               <p className="text-sm text-gray-600">Payment Status</p>
               <div className="mt-2">
-                <PaymentStatusBadge status={order.paymentStatus} />
+                <PaymentStatusBadge status={order.paymentStatus as any} />
               </div>
             </div>
           </div>
@@ -111,7 +111,7 @@ export default function AdminOrderDetailPage({ params }: { params: { id: string 
               </tr>
             </thead>
             <tbody>
-              {order.items.map((item) => {
+              {order.items.map((item: any) => {
                 const product = mockProducts.find((p) => p.id === item.productId)
                 return (
                   <tr key={item.id} className="border-b border-gray-100">

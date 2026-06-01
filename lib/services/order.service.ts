@@ -1,25 +1,25 @@
 import {
-  Order,
-  OrderStatus,
-  CreateOrderRequest,
-  DeliveryMethod,
-  OrderItem,
-  CartItem,
-} from '@/lib/types'
+  UIOrder,
+  UIOrderStatus,
+  UICreateOrderRequest,
+  UIDeliveryMethod,
+  UIOrderItem,
+  UICartItem,
+} from "@/lib/ui-types"
 
 export interface IOrderRepository {
-  create(order: Order): Promise<Order>
-  getById(id: string): Promise<Order | null>
-  getByOrderNumber(orderNumber: string): Promise<Order | null>
-  getByUserId(userId: string, limit?: number, offset?: number): Promise<Order[]>
-  getAll(limit?: number, offset?: number): Promise<Order[]>
-  update(id: string, order: Partial<Order>): Promise<Order>
-  updateStatus(id: string, status: OrderStatus): Promise<Order>
+  createOrder(order: UIOrder): Promise<UIOrder>
+  getOrderById(id: string): Promise<UIOrder | null>
+  getByOrderNumber(orderNumber: string): Promise<UIOrder | null>
+  getByUserId(userId: string, limit?: number, offset?: number): Promise<UIOrder[]>
+  getAll(limit?: number, offset?: number): Promise<UIOrder[]>
+  updateOrder(id: string, order: Partial<UIOrder>): Promise<UIOrder>
+  updateStatus(id: string, status: UIOrderStatus): Promise<UIOrder>
   delete(id: string): Promise<boolean>
 }
 
 export interface IProductRepository {
-  getById(id: string): Promise<any | null>
+  getProductById(id: string): Promise<any | null>
   getVariantById(variantId: string): Promise<any | null>
 }
 
@@ -50,11 +50,11 @@ export class OrderService {
    * Calculate checkout summary
    */
   async calculateCheckout(
-    items: CartItem[],
-    deliveryMethod: DeliveryMethod,
+    items: UICartItem[],
+    deliveryMethod: UIDeliveryMethod,
     voucherCode?: string,
   ): Promise<{
-    orderItems: OrderItem[]
+    orderItems: UIOrderItem[]
     subtotal: number
     tax: number
     shippingCost: number
@@ -62,16 +62,16 @@ export class OrderService {
     total: number
   }> {
     // Fetch product and variant data
-    const orderItems: OrderItem[] = []
+    const orderItems: UIOrderItem[] = []
     let subtotal = 0
 
     for (const item of items) {
-      const product = await this.productRepo.getById(item.productId)
+      const product = await this.productRepo.getProductById(item.productId)
       const variant = await this.productRepo.getVariantById(item.variantId)
 
       if (!product || !variant) {
         throw new Error(
-          `Product or variant not found: ${item.productId}, ${item.variantId}`,
+          `UIProduct or variant not found: ${item.productId}, ${item.variantId}`,
         )
       }
 
@@ -96,7 +96,7 @@ export class OrderService {
     const tax = Math.round(subtotal * 0.1)
 
     // Calculate shipping cost based on delivery method
-    const shippingCost = deliveryMethod === DeliveryMethod.PICKUP ? 0 : 50000 // 50k IDR for delivery
+    const shippingCost = deliveryMethod === UIDeliveryMethod.PICKUP ? 0 : 50000 // 50k IDR for delivery
 
     // Apply voucher if provided
     let discountAmount = 0
@@ -131,7 +131,7 @@ export class OrderService {
   /**
    * Create a new order from checkout
    */
-  async createOrder(req: CreateOrderRequest): Promise<Order> {
+  async createOrder(req: UICreateOrderRequest): Promise<UIOrder> {
     const {
       userId,
       items,
@@ -143,15 +143,15 @@ export class OrderService {
 
     const checkout = await this.calculateCheckout(items, deliveryMethod, voucherCode)
 
-    const order: Order = {
+    const order: UIOrder = {
       id: `order-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
       orderNumber: this.generateOrderNumber(),
       userId,
-      status: OrderStatus.WAITING_PAYMENT,
+      status: UIOrderStatus.WAITING_PAYMENT,
       deliveryMethod,
       items: checkout.orderItems,
       subtotal: checkout.subtotal,
-      tax: checkout.tax,
+      taxAmount: checkout.tax,
       shippingCost: checkout.shippingCost,
       discountAmount: checkout.discountAmount,
       voucherCode,
@@ -169,14 +169,14 @@ export class OrderService {
       }
     }
 
-    return this.orderRepo.create(order)
+    return this.orderRepo.createOrder(order)
   }
 
   /**
    * Get order by ID
    */
-  async getOrder(orderId: string): Promise<Order | null> {
-    return this.orderRepo.getById(orderId)
+  async getOrder(orderId: string): Promise<UIOrder | null> {
+    return this.orderRepo.getOrderById(orderId)
   }
 
   /**
@@ -186,62 +186,62 @@ export class OrderService {
     userId: string,
     limit: number = 20,
     offset: number = 0,
-  ): Promise<Order[]> {
+  ): Promise<UIOrder[]> {
     return this.orderRepo.getByUserId(userId, limit, offset)
   }
 
   /**
    * Get all orders (admin)
    */
-  async getAllOrders(limit: number = 50, offset: number = 0): Promise<Order[]> {
+  async getAllOrders(limit: number = 50, offset: number = 0): Promise<UIOrder[]> {
     return this.orderRepo.getAll(limit, offset)
   }
 
   /**
    * Update order status
    */
-  async updateOrderStatus(orderId: string, status: OrderStatus): Promise<Order> {
-    const order = await this.orderRepo.getById(orderId)
+  async updateOrderStatus(orderId: string, status: UIOrderStatus): Promise<UIOrder> {
+    const order = await this.orderRepo.getOrderById(orderId)
     if (!order) {
-      throw new Error(`Order not found: ${orderId}`)
+      throw new Error(`UIOrder not found: ${orderId}`)
     }
 
     // Validate status transitions
-    this.validateStatusTransition(order.status, status)
+    this.validateStatusTransition(order.status as UIOrderStatus, status)
 
-    const updateData: Partial<Order> = {
+    const updateData: Partial<UIOrder> = {
       status,
       updatedAt: new Date(),
     }
 
-    if (status === OrderStatus.DELIVERED) {
+    if (status === UIOrderStatus.DELIVERED) {
       updateData.completedAt = new Date()
     }
 
-    return this.orderRepo.update(orderId, updateData)
+    return this.orderRepo.updateOrder(orderId, updateData)
   }
 
   /**
    * Validate order status transitions
    */
   private validateStatusTransition(
-    currentStatus: OrderStatus,
-    newStatus: OrderStatus,
+    currentStatus: UIOrderStatus,
+    newStatus: UIOrderStatus,
   ): void {
-    const validTransitions: Record<OrderStatus, OrderStatus[]> = {
-      [OrderStatus.WAITING_PAYMENT]: [
-        OrderStatus.PAYMENT_RECEIVED,
-        OrderStatus.CANCELLED,
+    const validTransitions: Record<UIOrderStatus, UIOrderStatus[]> = {
+      [UIOrderStatus.WAITING_PAYMENT]: [
+        UIOrderStatus.PAYMENT_RECEIVED,
+        UIOrderStatus.CANCELLED,
       ],
-      [OrderStatus.PAYMENT_RECEIVED]: [
-        OrderStatus.PROCESSING,
-        OrderStatus.CANCELLED,
+      [UIOrderStatus.PAYMENT_RECEIVED]: [
+        UIOrderStatus.PROCESSING,
+        UIOrderStatus.CANCELLED,
       ],
-      [OrderStatus.PROCESSING]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
-      [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED, OrderStatus.CANCELLED],
-      [OrderStatus.DELIVERED]: [OrderStatus.REFUNDED],
-      [OrderStatus.CANCELLED]: [],
-      [OrderStatus.REFUNDED]: [],
+      [UIOrderStatus.PROCESSING]: [UIOrderStatus.SHIPPED, UIOrderStatus.CANCELLED],
+      [UIOrderStatus.SHIPPED]: [UIOrderStatus.DELIVERED, UIOrderStatus.CANCELLED],
+      [UIOrderStatus.DELIVERED]: [UIOrderStatus.REFUNDED],
+      [UIOrderStatus.CANCELLED]: [],
+      [UIOrderStatus.REFUNDED]: [],
     }
 
     if (!validTransitions[currentStatus]?.includes(newStatus)) {

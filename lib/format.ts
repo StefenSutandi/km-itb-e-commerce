@@ -1,4 +1,4 @@
-import { OrderStatus, PaymentStatus } from './types'
+import { UIOrderStatus, UIPaymentStatus } from "./ui-types"
 
 /**
  * Format currency to Indonesian Rupiah
@@ -41,15 +41,15 @@ export function formatDateTime(date: Date | string): string {
 /**
  * Format order status to display text
  */
-export function formatOrderStatus(status: OrderStatus): string {
-  const statusMap: Record<OrderStatus, string> = {
+export function formatOrderStatus(status: UIOrderStatus): string {
+  const statusMap: Record<UIOrderStatus, string> = {
     WAITING_PAYMENT: 'Waiting for Payment',
     PAYMENT_RECEIVED: 'Payment Received',
     PROCESSING: 'Processing',
     SHIPPED: 'Shipped',
     DELIVERED: 'Delivered',
     CANCELLED: 'Cancelled',
-    RETURNED: 'Returned',
+    REFUNDED: 'Refunded',
   }
   return statusMap[status] || status
 }
@@ -57,11 +57,15 @@ export function formatOrderStatus(status: OrderStatus): string {
 /**
  * Format payment status to display text
  */
-export function formatPaymentStatus(status: PaymentStatus): string {
-  const statusMap: Record<PaymentStatus, string> = {
+export function formatPaymentStatus(status: UIPaymentStatus): string {
+  const statusMap: Record<UIPaymentStatus, string> = {
     PENDING: 'Pending',
-    PAID: 'Paid',
+    AUTHORIZED: 'Authorized',
+    CAPTURED: 'Captured',
+    SETTLED: 'Settled',
+    EXPIRED: 'Expired',
     FAILED: 'Failed',
+    CANCELLED: 'Cancelled',
     REFUNDED: 'Refunded',
   }
   return statusMap[status] || status
@@ -70,15 +74,15 @@ export function formatPaymentStatus(status: PaymentStatus): string {
 /**
  * Get color class for order status badge
  */
-export function getOrderStatusColor(status: OrderStatus): string {
-  const colorMap: Record<OrderStatus, string> = {
+export function getOrderStatusColor(status: UIOrderStatus): string {
+  const colorMap: Record<UIOrderStatus, string> = {
     WAITING_PAYMENT: 'bg-yellow-100 text-yellow-800 border-yellow-300',
     PAYMENT_RECEIVED: 'bg-blue-100 text-blue-800 border-blue-300',
     PROCESSING: 'bg-blue-100 text-blue-800 border-blue-300',
     SHIPPED: 'bg-purple-100 text-purple-800 border-purple-300',
     DELIVERED: 'bg-green-100 text-green-800 border-green-300',
     CANCELLED: 'bg-red-100 text-red-800 border-red-300',
-    RETURNED: 'bg-gray-100 text-gray-800 border-gray-300',
+    REFUNDED: 'bg-gray-100 text-gray-800 border-gray-300',
   }
   return colorMap[status] || 'bg-gray-100 text-gray-800 border-gray-300'
 }
@@ -86,11 +90,15 @@ export function getOrderStatusColor(status: OrderStatus): string {
 /**
  * Get color class for payment status badge
  */
-export function getPaymentStatusColor(status: PaymentStatus): string {
-  const colorMap: Record<PaymentStatus, string> = {
+export function getPaymentStatusColor(status: UIPaymentStatus): string {
+  const colorMap: Record<UIPaymentStatus, string> = {
     PENDING: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-    PAID: 'bg-green-100 text-green-800 border-green-300',
+    AUTHORIZED: 'bg-blue-100 text-blue-800 border-blue-300',
+    CAPTURED: 'bg-indigo-100 text-indigo-800 border-indigo-300',
+    SETTLED: 'bg-green-100 text-green-800 border-green-300',
+    EXPIRED: 'bg-gray-100 text-gray-800 border-gray-300',
     FAILED: 'bg-red-100 text-red-800 border-red-300',
+    CANCELLED: 'bg-red-100 text-red-800 border-red-300',
     REFUNDED: 'bg-gray-100 text-gray-800 border-gray-300',
   }
   return colorMap[status] || 'bg-gray-100 text-gray-800 border-gray-300'

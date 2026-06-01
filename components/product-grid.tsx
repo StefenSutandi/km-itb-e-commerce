@@ -1,4 +1,4 @@
-import { Product } from '@/lib/types'
+import { UIProduct as Product } from "@/lib/ui-types"
 import { ProductCard } from '@/components/product-card'
 
 interface ProductGridProps {

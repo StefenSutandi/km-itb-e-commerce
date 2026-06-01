@@ -1,16 +1,16 @@
-import { PaymentTransaction, PaymentStatus, Order } from '@/lib/types'
+import { PaymentTransaction, UIPaymentStatus, UIOrder } from "@/lib/ui-types"
 
 export interface IPaymentRepository {
-  create(transaction: PaymentTransaction): Promise<PaymentTransaction>
-  getById(id: string): Promise<PaymentTransaction | null>
+  createPayment(transaction: PaymentTransaction): Promise<PaymentTransaction>
+  getPaymentById(id: string): Promise<PaymentTransaction | null>
   getByOrderId(orderId: string): Promise<PaymentTransaction | null>
   getByExternalId(externalId: string): Promise<PaymentTransaction | null>
-  update(id: string, transaction: Partial<PaymentTransaction>): Promise<PaymentTransaction>
+  updatePayment(id: string, transaction: Partial<PaymentTransaction>): Promise<PaymentTransaction>
 }
 
 export interface IMidtransGateway {
   createTransaction(
-    order: Order,
+    order: UIOrder,
     customerEmail: string,
     customerPhone: string,
     customerName: string,
@@ -32,14 +32,14 @@ export class PaymentService {
 
   /**
    * Create payment transaction via Midtrans
-   * @param order Order object
+   * @param order UIOrder object
    * @param customerEmail Customer email
    * @param customerPhone Customer phone
    * @param customerName Customer name
    * @returns Payment transaction with redirect URL
    */
   async createMidtransTransaction(
-    order: Order,
+    order: UIOrder,
     customerEmail: string,
     customerPhone: string,
     customerName: string,
@@ -62,7 +62,7 @@ export class PaymentService {
     const paymentTransaction: PaymentTransaction = {
       id: `payment-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
       orderId: order.id,
-      status: PaymentStatus.PENDING,
+      status: UIPaymentStatus.PENDING,
       amount: order.total,
       currency: 'IDR',
       method: 'MIDTRANS',
@@ -76,7 +76,7 @@ export class PaymentService {
       updatedAt: new Date(),
     }
 
-    const savedPayment = await this.paymentRepo.create(paymentTransaction)
+    const savedPayment = await this.paymentRepo.createPayment(paymentTransaction)
 
     return {
       payment: savedPayment,
@@ -87,7 +87,7 @@ export class PaymentService {
 
   /**
    * Handle Midtrans webhook callback
-   * @param orderId Midtrans Order ID
+   * @param orderId Midtrans UIOrder ID
    * @param transactionStatus Midtrans transaction status
    * @param grossAmount Gross amount in string
    * @param signature Midtrans signature
@@ -116,36 +116,36 @@ export class PaymentService {
       throw new Error(`Payment not found for Midtrans order: ${orderId}`)
     }
 
-    // TODO: Map Midtrans status to our PaymentStatus
+    // TODO: Map Midtrans status to our UIPaymentStatus
     // Midtrans statuses: capture, settlement, pending, deny, cancel, expire, failure
-    const statusMap: Record<string, PaymentStatus> = {
-      capture: PaymentStatus.CAPTURED,
-      settlement: PaymentStatus.SETTLED,
-      pending: PaymentStatus.PENDING,
-      deny: PaymentStatus.FAILED,
-      cancel: PaymentStatus.CANCELLED,
-      expire: PaymentStatus.EXPIRED,
-      failure: PaymentStatus.FAILED,
+    const statusMap: Record<string, UIPaymentStatus> = {
+      capture: UIPaymentStatus.CAPTURED,
+      settlement: UIPaymentStatus.SETTLED,
+      pending: UIPaymentStatus.PENDING,
+      deny: UIPaymentStatus.FAILED,
+      cancel: UIPaymentStatus.CANCELLED,
+      expire: UIPaymentStatus.EXPIRED,
+      failure: UIPaymentStatus.FAILED,
     }
 
-    const newStatus = statusMap[transactionStatus] || PaymentStatus.PENDING
+    const newStatus = statusMap[transactionStatus] || UIPaymentStatus.PENDING
 
     // TODO: Implement idempotency - check if this webhook was already processed
     // This prevents duplicate processing if webhook is retried
 
-    const updatedPayment = await this.paymentRepo.update(payment.id, {
+    const updatedPayment = await this.paymentRepo.updatePayment(payment.id, {
       status: newStatus,
       updatedAt: new Date(),
-      completedAt: [PaymentStatus.SETTLED, PaymentStatus.CAPTURED].includes(newStatus)
+      completedAt: [UIPaymentStatus.SETTLED, UIPaymentStatus.CAPTURED].includes(newStatus)
         ? new Date()
         : undefined,
     })
 
     // TODO: Update order status if payment is successful
-    // if ([PaymentStatus.SETTLED, PaymentStatus.CAPTURED].includes(newStatus)) {
+    // if ([UIPaymentStatus.SETTLED, UIPaymentStatus.CAPTURED].includes(newStatus)) {
     //   await orderService.updateOrderStatus(
     //     payment.orderId,
-    //     OrderStatus.PAYMENT_RECEIVED,
+    //     UIOrderStatus.PAYMENT_RECEIVED,
     //   )
     // }
 
@@ -156,7 +156,7 @@ export class PaymentService {
    * Get payment transaction by ID
    */
   async getPayment(paymentId: string): Promise<PaymentTransaction | null> {
-    return this.paymentRepo.getById(paymentId)
+    return this.paymentRepo.getPaymentById(paymentId)
   }
 
   /**
@@ -168,7 +168,7 @@ export class PaymentService {
 
   /**
    * Check payment status with Midtrans
-   * @param orderId Midtrans Order ID
+   * @param orderId Midtrans UIOrder ID
    */
   async checkMidtransStatus(orderId: string): Promise<any> {
     return this.midtransGateway.getTransactionStatus(orderId)
@@ -181,18 +181,18 @@ export class PaymentService {
    */
   async updatePaymentStatus(
     paymentId: string,
-    newStatus: PaymentStatus,
+    newStatus: UIPaymentStatus,
   ): Promise<PaymentTransaction> {
-    const payment = await this.paymentRepo.getById(paymentId)
+    const payment = await this.paymentRepo.getPaymentById(paymentId)
     if (!payment) {
       throw new Error(`Payment not found: ${paymentId}`)
     }
 
     // TODO: Log this admin action for audit trail
-    return this.paymentRepo.update(paymentId, {
+    return this.paymentRepo.updatePayment(paymentId, {
       status: newStatus,
       updatedAt: new Date(),
-      completedAt: [PaymentStatus.SETTLED, PaymentStatus.CAPTURED].includes(newStatus)
+      completedAt: [UIPaymentStatus.SETTLED, UIPaymentStatus.CAPTURED].includes(newStatus)
         ? new Date()
         : undefined,
     })

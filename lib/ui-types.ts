@@ -2,7 +2,7 @@
 // ENUMS & CONSTANTS
 // ============================================================================
 
-export enum OrderStatus {
+export enum UIOrderStatus {
   WAITING_PAYMENT = 'WAITING_PAYMENT',
   PAYMENT_RECEIVED = 'PAYMENT_RECEIVED',
   PROCESSING = 'PROCESSING',
@@ -12,7 +12,7 @@ export enum OrderStatus {
   REFUNDED = 'REFUNDED',
 }
 
-export enum PaymentStatus {
+export enum UIPaymentStatus {
   PENDING = 'PENDING',
   AUTHORIZED = 'AUTHORIZED',
   CAPTURED = 'CAPTURED',
@@ -23,12 +23,12 @@ export enum PaymentStatus {
   REFUNDED = 'REFUNDED',
 }
 
-export enum DeliveryMethod {
+export enum UIDeliveryMethod {
   PICKUP = 'PICKUP',
   DELIVERY = 'DELIVERY',
 }
 
-export enum AdminRole {
+export enum UIAdminRole {
   SUPER_ADMIN = 'SUPER_ADMIN',
   ADMIN = 'ADMIN',
   STAFF = 'STAFF',
@@ -38,7 +38,7 @@ export enum AdminRole {
 // USER TYPES
 // ============================================================================
 
-export interface User {
+export interface UIUser {
   id: string
   email: string
   name: string
@@ -46,12 +46,14 @@ export interface User {
   address?: string
   city?: string
   postalCode?: string
-  createdAt: Date
-  updatedAt: Date
+  role?: string
+  createdAt?: Date
+  updatedAt?: Date
+  isActive?: boolean
 }
 
-export interface AdminUser extends User {
-  role: AdminRole
+export interface UIAdminUser extends UIUser {
+  role: UIAdminRole
   permissions: string[]
 }
 
@@ -59,50 +61,52 @@ export interface AdminUser extends User {
 // PRODUCT TYPES
 // ============================================================================
 
-export interface Product {
+export interface UIProduct {
   id: string
   name: string
   description: string
   slug: string
   category: string
-  basePrice: number
-  image: string
-  thumbnail?: string
-  isFeatured: boolean
-  isActive: boolean
+  price: number
+  images: string[]
+  isFeatured?: boolean
+  status?: string
+  isActive?: boolean
   createdAt: Date
   updatedAt: Date
-  variants: ProductVariant[]
+  variants?: UIProductVariant[]
 }
 
-export interface ProductVariant {
+export interface UIProductVariant {
   id: string
   productId: string
-  name: string // e.g., "Size: M", "Color: Black"
+  name?: string
+  color?: string
+  size?: string
   sku: string
-  price: number // Variant-specific price
   stock: number
-  image?: string
-  isActive: boolean
-  createdAt: Date
-  updatedAt: Date
+  price?: number
+  createdAt?: Date
+  updatedAt?: Date
+  isActive?: boolean
 }
 
 // ============================================================================
 // CART TYPES
 // ============================================================================
 
-export interface CartItem {
+export interface UICartItem {
   id: string
+  orderId?: string
   productId: string
   variantId: string
   quantity: number
   addedAt: Date
 }
 
-export interface Cart {
+export interface UICart {
   userId: string
-  items: CartItem[]
+  items: UICartItem[]
   createdAt: Date
   updatedAt: Date
 }
@@ -111,28 +115,30 @@ export interface Cart {
 // ORDER TYPES
 // ============================================================================
 
-export interface OrderItem {
+export interface UIOrderItem {
   id: string
+  orderId?: string
   productId: string
   variantId: string
-  productName: string
-  productImage: string
-  variantName: string
-  sku: string
+  productName?: string
+  productImage?: string
+  variantName?: string
+  sku?: string
   quantity: number
   unitPrice: number
   subtotal: number
 }
 
-export interface Order {
+export interface UIOrder {
   id: string
   orderNumber: string
   userId: string
-  status: OrderStatus
-  deliveryMethod: DeliveryMethod
-  items: OrderItem[]
+  status: UIOrderStatus
+  paymentStatus?: UIPaymentStatus
+  deliveryMethod: UIDeliveryMethod
+  items: UIOrderItem[]
   subtotal: number
-  tax: number
+  taxAmount: number
   shippingCost: number
   discountAmount: number
   voucherCode?: string
@@ -150,12 +156,12 @@ export interface Order {
 export interface PaymentTransaction {
   id: string
   orderId: string
-  status: PaymentStatus
+  status: UIPaymentStatus
   amount: number
   currency: string
   method: string // 'MIDTRANS', 'BANK_TRANSFER', etc.
   externalTransactionId?: string // Midtrans Transaction ID
-  externalReference?: string // Midtrans Order ID / Reference
+  externalReference?: string // Midtrans UIOrder ID / Reference
   metadata?: Record<string, any>
   createdAt: Date
   updatedAt: Date
@@ -166,7 +172,7 @@ export interface PaymentTransaction {
 // INVOICE TYPES
 // ============================================================================
 
-export interface Invoice {
+export interface UIInvoice {
   id: string
   orderId: string
   invoiceNumber: string
@@ -179,7 +185,7 @@ export interface Invoice {
     phone?: string
     address?: string
   }
-  items: OrderItem[]
+  items: UIOrderItem[]
   subtotal: number
   tax: number
   shippingCost: number
@@ -195,17 +201,18 @@ export interface Invoice {
 // VOUCHER TYPES
 // ============================================================================
 
-export interface Voucher {
+export interface UIVoucher {
   id: string
+  isActive?: boolean
+  status?: string
   code: string
   description?: string
   discountType: 'FIXED' | 'PERCENTAGE'
   discountValue: number
   maxUsage: number
-  currentUsage: number
+  usageCount: number
   minPurchaseAmount?: number
   maxDiscountAmount?: number
-  isActive: boolean
   expiresAt: Date
   createdAt: Date
   updatedAt: Date
@@ -215,7 +222,7 @@ export interface Voucher {
 // REPORT/ANALYTICS TYPES
 // ============================================================================
 
-export interface SalesMetrics {
+export interface UISalesMetrics {
   totalRevenue: number
   totalOrders: number
   averageOrderValue: number
@@ -224,39 +231,39 @@ export interface SalesMetrics {
   processingOrders: number
 }
 
-export interface RevenueData {
+export interface UIRevenueData {
   date: Date
   revenue: number
   orders: number
 }
 
-export interface TopProduct {
+export interface UITopProduct {
   productId: string
   productName: string
   totalQuantity: number
   totalRevenue: number
 }
 
-export interface SalesReport {
+export interface UISalesReport {
   period: {
     startDate: Date
     endDate: Date
   }
-  metrics: SalesMetrics
-  revenueByDate: RevenueData[]
-  topProducts: TopProduct[]
-  ordersByStatus: Record<OrderStatus, number>
-  ordersByDeliveryMethod: Record<DeliveryMethod, number>
+  metrics: UISalesMetrics
+  revenueByDate: UIRevenueData[]
+  topProducts: UITopProduct[]
+  ordersByStatus: Record<UIOrderStatus, number>
+  ordersByDeliveryMethod: Record<UIDeliveryMethod, number>
 }
 
 // ============================================================================
 // REQUEST/RESPONSE TYPES
 // ============================================================================
 
-export interface CreateOrderRequest {
+export interface UICreateOrderRequest {
   userId: string
-  items: CartItem[]
-  deliveryMethod: DeliveryMethod
+  items: UICartItem[]
+  deliveryMethod: UIDeliveryMethod
   shippingAddress?: {
     name: string
     phone: string
@@ -268,15 +275,15 @@ export interface CreateOrderRequest {
   notes?: string
 }
 
-export interface CreateOrderResponse {
+export interface UICreateOrderResponse {
   success: boolean
-  order?: Order
+  order?: UIOrder
   payment?: PaymentTransaction
   error?: string
 }
 
-export interface CheckoutSummary {
-  items: OrderItem[]
+export interface UICheckoutSummary {
+  items: UIOrderItem[]
   subtotal: number
   tax: number
   shippingCost: number
@@ -289,7 +296,7 @@ export interface CheckoutSummary {
 // API ERROR TYPES
 // ============================================================================
 
-export interface ApiResponse<T> {
+export interface UIApiResponse<T> {
   success: boolean
   data?: T
   error?: {

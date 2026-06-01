@@ -29,11 +29,11 @@ export default function OrdersPage() {
                   <div className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-400 transition-colors cursor-pointer">
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-6 items-start">
                       <div>
-                        <p className="text-sm text-gray-600">Order Number</p>
+                        <p className="text-sm text-gray-600">UIOrder Number</p>
                         <p className="font-semibold">{order.orderNumber}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">Order Date</p>
+                        <p className="text-sm text-gray-600">UIOrder Date</p>
                         <p className="font-semibold">{formatDate(order.createdAt)}</p>
                       </div>
                       <div>
@@ -49,7 +49,7 @@ export default function OrdersPage() {
                       <div>
                         <p className="text-sm text-gray-600">Payment</p>
                         <div className="mt-1">
-                          <PaymentStatusBadge status={order.paymentStatus} />
+                          <PaymentStatusBadge status={order.paymentStatus as any} />
                         </div>
                       </div>
                     </div>

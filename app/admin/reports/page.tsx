@@ -54,7 +54,7 @@ export default function AdminReportsPage() {
           <p className="text-xs text-gray-500 mt-2">Completed orders</p>
         </Card>
         <Card className="p-6 border-gray-200">
-          <p className="text-sm text-gray-600 font-medium">Average Order Value</p>
+          <p className="text-sm text-gray-600 font-medium">Average UIOrder Value</p>
           <p className="text-3xl font-bold mt-2">{formatCurrency(averageOrderValue)}</p>
           <p className="text-xs text-gray-500 mt-2">Per order</p>
         </Card>
@@ -72,7 +72,7 @@ export default function AdminReportsPage() {
           <table className="w-full text-sm">
             <thead className="border-b border-gray-200">
               <tr>
-                <th className="text-left py-3 px-4 font-semibold">Product</th>
+                <th className="text-left py-3 px-4 font-semibold">UIProduct</th>
                 <th className="text-left py-3 px-4 font-semibold">Units Sold</th>
                 <th className="text-left py-3 px-4 font-semibold">Revenue</th>
                 <th className="text-left py-3 px-4 font-semibold">Percentage</th>
@@ -106,9 +106,9 @@ export default function AdminReportsPage() {
         </div>
       </Card>
 
-      {/* Order Status Distribution */}
+      {/* UIOrder Status Distribution */}
       <Card className="p-6 border-gray-200">
-        <h2 className="text-xl font-semibold mb-6">Order Status Distribution</h2>
+        <h2 className="text-xl font-semibold mb-6">UIOrder Status Distribution</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {[
             {

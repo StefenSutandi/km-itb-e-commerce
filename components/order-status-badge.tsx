@@ -1,4 +1,4 @@
-import { OrderStatus, PaymentStatus } from '@/lib/types'
+import { UIOrderStatus as OrderStatus, UIPaymentStatus as PaymentStatus } from "@/lib/ui-types"
 import { formatOrderStatus, formatPaymentStatus, getOrderStatusColor, getPaymentStatusColor } from '@/lib/format'
 
 interface OrderStatusBadgeProps {

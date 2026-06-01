@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { Order, PaymentStatus, OrderStatus } from '@/lib/types'
+import { UIOrder, UIPaymentStatus, UIOrderStatus } from "@/lib/ui-types"
 
 /**
  * Format amount in IDR with proper decimal places
@@ -51,40 +51,40 @@ export function verifyMidtransSignature(
 }
 
 /**
- * Map Midtrans transaction status to our PaymentStatus enum
+ * Map Midtrans transaction status to our UIPaymentStatus enum
  * Midtrans statuses: capture, settlement, pending, deny, cancel, expire, failure
  */
-export function mapMidtransStatusToPaymentStatus(midtransStatus: string): PaymentStatus {
-  const statusMap: Record<string, PaymentStatus> = {
-    capture: PaymentStatus.CAPTURED,
-    settlement: PaymentStatus.SETTLED,
-    pending: PaymentStatus.PENDING,
-    deny: PaymentStatus.FAILED,
-    cancel: PaymentStatus.CANCELLED,
-    expire: PaymentStatus.EXPIRED,
-    failure: PaymentStatus.FAILED,
+export function mapMidtransStatusToPaymentStatus(midtransStatus: string): UIPaymentStatus {
+  const statusMap: Record<string, UIPaymentStatus> = {
+    capture: UIPaymentStatus.CAPTURED,
+    settlement: UIPaymentStatus.SETTLED,
+    pending: UIPaymentStatus.PENDING,
+    deny: UIPaymentStatus.FAILED,
+    cancel: UIPaymentStatus.CANCELLED,
+    expire: UIPaymentStatus.EXPIRED,
+    failure: UIPaymentStatus.FAILED,
   }
 
-  return statusMap[midtransStatus] || PaymentStatus.PENDING
+  return statusMap[midtransStatus] || UIPaymentStatus.PENDING
 }
 
 /**
  * Check if payment status indicates successful payment
  */
-export function isPaymentSuccessful(status: PaymentStatus): boolean {
-  return [PaymentStatus.CAPTURED, PaymentStatus.SETTLED].includes(status)
+export function isPaymentSuccessful(status: UIPaymentStatus): boolean {
+  return [UIPaymentStatus.CAPTURED, UIPaymentStatus.SETTLED].includes(status)
 }
 
 /**
- * Get corresponding OrderStatus for PaymentStatus
+ * Get corresponding UIOrderStatus for UIPaymentStatus
  */
-export function getOrderStatusForPaymentStatus(paymentStatus: PaymentStatus): OrderStatus | null {
+export function getOrderStatusForPaymentStatus(paymentStatus: UIPaymentStatus): UIOrderStatus | null {
   if (isPaymentSuccessful(paymentStatus)) {
-    return OrderStatus.PAYMENT_RECEIVED
+    return UIOrderStatus.PAYMENT_RECEIVED
   }
 
-  if ([PaymentStatus.FAILED, PaymentStatus.EXPIRED, PaymentStatus.CANCELLED].includes(paymentStatus)) {
-    return OrderStatus.CANCELLED
+  if ([UIPaymentStatus.FAILED, UIPaymentStatus.EXPIRED, UIPaymentStatus.CANCELLED].includes(paymentStatus)) {
+    return UIOrderStatus.CANCELLED
   }
 
   return null
@@ -96,7 +96,7 @@ export function getOrderStatusForPaymentStatus(paymentStatus: PaymentStatus): Or
  * Create Midtrans transaction request body
  */
 export function buildMidtransTransactionRequest(
-  order: Order,
+  order: UIOrder,
   customerEmail: string,
   customerPhone: string,
   customerName: string,
@@ -142,7 +142,7 @@ export function buildMidtransTransactionRequest(
       first_name: firstName,
       last_name: lastName || '',
     },
-    item_details: order.items.map((item) => ({
+    item_details: order.items.map((item: any) => ({
       id: item.sku,
       price: item.unitPrice,
       quantity: item.quantity,
