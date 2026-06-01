@@ -47,13 +47,26 @@ export default async function OrderDetailPage({ params }: { params: { id: string
               <h1 className="text-4xl font-light">Order {order.orderNumber}</h1>
               <p className="text-gray-600 mt-2">{formatDate(order.createdAt)}</p>
             </div>
-            {order.status === 'WAITING_PAYMENT' && (
+            {order.status === 'WAITING_PAYMENT' && paymentStatus !== 'SUCCESS' && (
               <MidtransPayButton 
                 orderId={order.id} 
                 existingRedirectUrl={firstPayment?.snapRedirectUrl} 
               />
             )}
           </div>
+
+          {order.status === 'MANUAL_REVIEW' && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg shadow-sm">
+              <p className="font-medium">Pembayaran berhasil, tetapi pesanan memerlukan pengecekan admin.</p>
+              <p className="text-sm mt-1">Tim kami akan segera menghubungi Anda terkait status stok barang.</p>
+            </div>
+          )}
+
+          {order.status === 'CANCELLED' && (
+            <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg shadow-sm">
+              <p className="font-medium">Pesanan Dibatalkan</p>
+            </div>
+          )}
 
           {/* Status Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

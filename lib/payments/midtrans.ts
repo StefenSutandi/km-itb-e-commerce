@@ -77,3 +77,25 @@ export async function createSnapTransaction(
 
   return data
 }
+
+import * as crypto from 'crypto'
+
+export function verifyMidtransSignature(
+  orderId: string,
+  statusCode: string,
+  grossAmount: string,
+  serverKey: string,
+  incomingSignature: string
+): boolean {
+  if (!orderId || !statusCode || !grossAmount || !serverKey || !incomingSignature) {
+    return false
+  }
+
+  const payload = orderId + statusCode + grossAmount + serverKey
+  const generatedSignature = crypto
+    .createHash('sha512')
+    .update(payload)
+    .digest('hex')
+
+  return generatedSignature === incomingSignature
+}
