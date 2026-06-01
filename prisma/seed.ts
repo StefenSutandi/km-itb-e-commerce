@@ -177,28 +177,38 @@ async function main() {
   }
 
   // 3. Seed Sample Orders for buyerUser
-  const sampleProduct = await prisma.productVariant.findFirst()
-  if (sampleProduct) {
+  const sampleVariant = await prisma.productVariant.findFirst({
+    include: { product: true }
+  })
+  
+  if (sampleVariant) {
     await prisma.order.create({
       data: {
         orderNumber: "ORD-TEST-001",
         userId: buyerUser.id,
         status: "COMPLETED",
-        subtotal: sampleProduct.price,
+        subtotal: sampleVariant.price,
         buyerFee: 5000,
         deliveryFee: 15000,
-        total: Number(sampleProduct.price) + 20000,
+        total: Number(sampleVariant.price) + 20000,
         deliveryMethod: "DELIVERY",
         shippingName: buyerUser.name,
         shippingPhone: buyerUser.waNumber,
         shippingStreet: "Asrama ITB Kidang Pananjung",
         shippingCity: "Bandung",
         items: {
-          create: {
-            variantId: sampleProduct.id,
-            quantity: 1,
-            price: sampleProduct.price,
-          }
+          create: [
+            {
+              variantId: sampleVariant.id,
+              quantity: 1,
+              price: sampleVariant.price,
+              subtotal: sampleVariant.price,
+              productName: sampleVariant.product.name,
+              productSlug: sampleVariant.product.slug,
+              variantName: sampleVariant.name,
+              variantSku: sampleVariant.sku
+            }
+          ]
         }
       }
     })

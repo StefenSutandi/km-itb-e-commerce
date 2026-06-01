@@ -7,7 +7,8 @@ interface CartSummaryProps {
   shipping: number
   discount?: number
   total: number
-  onCheckout?: () => void
+  onCheckout?: string | (() => void)
+
   isLoading?: boolean
 }
 
@@ -30,7 +31,7 @@ export function CartSummary({
           <span>{formatCurrency(subtotal)}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Tax (10%)</span>
+          <span className="text-gray-600">Platform Fee (2%)</span>
           <span>{formatCurrency(tax)}</span>
         </div>
         <div className="flex justify-between text-sm">
@@ -50,13 +51,24 @@ export function CartSummary({
         <span>{formatCurrency(total)}</span>
       </div>
 
-      <Button
-        onClick={onCheckout}
-        disabled={isLoading || total === 0}
-        className="w-full rounded-full bg-black hover:bg-gray-900 text-white font-semibold py-6 mt-4"
-      >
-        {isLoading ? 'Processing...' : 'Proceed to Checkout'}
-      </Button>
+      {typeof onCheckout === 'string' ? (
+        <a href={onCheckout} className="block w-full mt-4">
+          <Button
+            disabled={isLoading || total === 0}
+            className="w-full rounded-full bg-black hover:bg-gray-900 text-white font-semibold py-6"
+          >
+            {isLoading ? 'Processing...' : 'Proceed to Checkout'}
+          </Button>
+        </a>
+      ) : (
+        <Button
+          onClick={onCheckout}
+          disabled={isLoading || total === 0}
+          className="w-full rounded-full bg-black hover:bg-gray-900 text-white font-semibold py-6 mt-4"
+        >
+          {isLoading ? 'Processing...' : 'Proceed to Checkout'}
+        </Button>
+      )}
     </div>
   )
 }

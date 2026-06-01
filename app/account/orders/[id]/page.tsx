@@ -1,14 +1,41 @@
-import { mockOrders, mockProducts } from '@/lib/mock-data'
 import { formatCurrency, formatDate } from '@/lib/format'
 import { OrderStatusBadge, PaymentStatusBadge } from '@/components/order-status-badge'
 import { Card } from '@/components/ui/card'
+import { auth } from '@/auth'
+import { orderRepository } from '@/lib/repositories/order.repository'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
-export default function OrderDetailPage({ params }: { params: { id: string } }) {
-  const order = mockOrders.find((o) => o.id === params.id)
+export const metadata = {
+  title: 'Order Detail | KM ITB Merchandise',
+}
+
+export default async function OrderDetailPage({ params }: { params: { id: string } }) {
+  const session = await auth()
+
+  if (!session?.user?.id) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-20">
+        <p className="text-gray-600 text-lg mb-4">Silakan login untuk melihat detail pesanan Anda.</p>
+        <Link href="/login">
+          <Button className="rounded-full bg-black hover:bg-gray-900 text-white">Login</Button>
+        </Link>
+      </div>
+    )
+  }
+
+  const order = await orderRepository.getOrderByIdForUser(session.user.id, params.id)
 
   if (!order) {
-    return <div>Order not found</div>
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-20">
+        <p className="text-gray-600 text-lg">Pesanan tidak ditemukan.</p>
+      </div>
+    )
   }
+
+  const firstPayment = order.payments?.[0]
+  const paymentStatus = firstPayment?.status || 'WAITING'
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -24,13 +51,13 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
             <Card className="p-6 border-gray-200">
               <p className="text-sm text-gray-600">Order Status</p>
               <div className="mt-3">
-                <OrderStatusBadge status={order.status} />
+                <OrderStatusBadge status={order.status as any} />
               </div>
             </Card>
             <Card className="p-6 border-gray-200">
               <p className="text-sm text-gray-600">Payment Status</p>
               <div className="mt-3">
-                <PaymentStatusBadge status={order.paymentStatus as any} />
+                <PaymentStatusBadge status={paymentStatus as any} />
               </div>
             </Card>
           </div>
@@ -39,29 +66,25 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
           <Card className="p-6 border-gray-200">
             <h2 className="text-xl font-semibold mb-6">Order Items</h2>
             <div className="space-y-4">
-              {order.items.map((item: any) => {
-                const product = mockProducts.find((p) => p.id === item.productId)
-                return (
-                  <div
-                    key={item.id}
-                    className="flex gap-4 p-4 border border-gray-100 rounded-lg"
-                  >
-                    <img
-                      src={product?.images[0]}
-                      alt={product?.name}
-                      className="w-20 h-20 object-cover rounded"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{product?.name}</h3>
-                      <p className="text-sm text-gray-600 mt-1">Qty: {item.quantity}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold">{formatCurrency(item.unitPrice)}</p>
-                      <p className="text-sm text-gray-600">{formatCurrency(item.subtotal)}</p>
-                    </div>
+              {order.items.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex gap-4 p-4 border border-gray-100 rounded-lg"
+                >
+                  <div className="w-20 h-20 bg-gray-100 rounded flex items-center justify-center text-gray-400">
+                    <span className="text-xs text-center px-2">Image unavailable</span>
                   </div>
-                )
-              })}
+                  <div className="flex-1">
+                    <h3 className="font-semibold">{item.productName}</h3>
+                    <p className="text-sm text-gray-600">{item.variantName}</p>
+                    <p className="text-sm text-gray-600 mt-1">Qty: {item.quantity}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold">{formatCurrency(Number(item.price))}</p>
+                    <p className="text-sm text-gray-600">{formatCurrency(Number(item.subtotal))}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </Card>
 
@@ -71,52 +94,52 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal</span>
-                <span className="font-medium">{formatCurrency(order.subtotal)}</span>
+                <span className="font-medium">{formatCurrency(Number(order.subtotal))}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Tax (10%)</span>
-                <span className="font-medium">{formatCurrency(order.taxAmount)}</span>
+                <span className="text-gray-600">Platform Fee (2%)</span>
+                <span className="font-medium">{formatCurrency(Number(order.buyerFee))}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Shipping</span>
                 <span className="font-medium">
-                  {order.shippingCost === 0 ? 'FREE' : formatCurrency(order.shippingCost)}
+                  {Number(order.deliveryFee) === 0 ? 'FREE' : formatCurrency(Number(order.deliveryFee))}
                 </span>
               </div>
-              {order.discountAmount > 0 && (
+              {Number(order.discount) > 0 && (
                 <div className="flex justify-between text-green-600">
                   <span>Discount</span>
-                  <span>-{formatCurrency(order.discountAmount)}</span>
+                  <span>-{formatCurrency(Number(order.discount))}</span>
                 </div>
               )}
               <div className="border-t border-gray-200 pt-3 flex justify-between font-semibold text-lg">
                 <span>Total</span>
-                <span>{formatCurrency(order.total)}</span>
+                <span>{formatCurrency(Number(order.total))}</span>
               </div>
             </div>
           </Card>
 
           {/* Delivery Info */}
           <Card className="p-6 border-gray-200">
-            <h2 className="text-xl font-semibold mb-4">Delivery Information</h2>
+            <h2 className="text-xl font-semibold mb-6">Delivery Information</h2>
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-gray-600">Delivery Method</p>
-                <p className="font-medium mt-1">
-                  {order.deliveryMethod === 'PICKUP' ? 'Store Pickup' : 'Home Delivery'}
-                </p>
+                <p className="font-medium">{order.deliveryMethod}</p>
               </div>
               {order.deliveryMethod === 'DELIVERY' && (
                 <>
                   <div>
-                    <p className="text-sm text-gray-600">Delivery Address</p>
-                    <p className="font-medium mt-1">123 Jalan Ganesha, Bandung, Indonesia</p>
+                    <p className="text-sm text-gray-600">Shipping Address</p>
+                    <p className="font-medium">
+                      {order.shippingName}<br />
+                      {order.shippingStreet}<br />
+                      {order.shippingCity}, {order.shippingPostal}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Estimated Delivery</p>
-                    <p className="font-medium mt-1">
-                      {new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('id-ID')}
-                    </p>
+                    <p className="text-sm text-gray-600">Contact</p>
+                    <p className="font-medium">{order.shippingPhone}</p>
                   </div>
                 </>
               )}

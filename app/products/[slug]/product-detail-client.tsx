@@ -11,13 +11,29 @@ export function ProductDetailClient({ product }: { product: UIProduct }) {
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
 
-  const handleAddToCart = () => {
-    // TODO: Implement cart state management
-    console.log('Added to cart:', {
-      product,
-      variant: selectedVariant,
-      quantity,
-    })
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+
+  const handleAddToCart = async () => {
+    if (!selectedVariant) return
+    setLoading(true)
+    setMessage('')
+    setError('')
+
+    try {
+      const { addToCartAction } = await import('@/app/cart/actions')
+      const res = await addToCartAction(selectedVariant.id, quantity)
+      if (res?.error) {
+        setError(res.error)
+      } else {
+        setMessage('Item added to cart successfully!')
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to add item to cart')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -120,14 +136,18 @@ export function ProductDetailClient({ product }: { product: UIProduct }) {
               </div>
             </div>
 
+            {/* Status Messages */}
+            {error && <div className="text-sm text-red-600 font-medium">{error}</div>}
+            {message && <div className="text-sm text-green-600 font-medium">{message}</div>}
+
             {/* CTA Buttons */}
             <div className="space-y-3 pt-4">
               <Button
                 onClick={handleAddToCart}
-                disabled={!selectedVariant || selectedVariant.stock === 0}
+                disabled={loading || !selectedVariant || selectedVariant.stock === 0}
                 className="w-full rounded-full bg-black hover:bg-gray-900 text-white font-semibold py-6"
               >
-                Add to Cart
+                {loading ? 'Adding...' : 'Add to Cart'}
               </Button>
               <Button
                 variant="outline"

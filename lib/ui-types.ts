@@ -102,6 +102,11 @@ export interface UICartItem {
   variantId: string
   quantity: number
   addedAt: Date
+  // Extracted details for UI rendering without extra fetches
+  productName?: string
+  variantName?: string
+  price?: number
+  image?: string
 }
 
 export interface UICart {
