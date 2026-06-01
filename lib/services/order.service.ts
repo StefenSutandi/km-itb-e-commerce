@@ -229,17 +229,15 @@ export class OrderService {
     newStatus: UIOrderStatus,
   ): void {
     const validTransitions: Record<UIOrderStatus, UIOrderStatus[]> = {
-      [UIOrderStatus.WAITING_PAYMENT]: [
-        UIOrderStatus.PAYMENT_RECEIVED,
-        UIOrderStatus.CANCELLED,
-      ],
-      [UIOrderStatus.PAYMENT_RECEIVED]: [
-        UIOrderStatus.PROCESSING,
-        UIOrderStatus.CANCELLED,
-      ],
-      [UIOrderStatus.PROCESSING]: [UIOrderStatus.SHIPPED, UIOrderStatus.CANCELLED],
-      [UIOrderStatus.SHIPPED]: [UIOrderStatus.DELIVERED, UIOrderStatus.CANCELLED],
+      [UIOrderStatus.WAITING_PAYMENT]: [UIOrderStatus.PAYMENT_RECEIVED, UIOrderStatus.CANCELLED],
+      [UIOrderStatus.MANUAL_REVIEW]: [UIOrderStatus.PAYMENT_RECEIVED, UIOrderStatus.CANCELLED],
+      [UIOrderStatus.PAYMENT_RECEIVED]: [UIOrderStatus.PROCESSING, UIOrderStatus.CANCELLED],
+      [UIOrderStatus.PROCESSING]: [UIOrderStatus.READY_TO_SHIP, UIOrderStatus.READY_FOR_PICKUP, UIOrderStatus.SHIPPED, UIOrderStatus.CANCELLED],
+      [UIOrderStatus.READY_FOR_PICKUP]: [UIOrderStatus.COMPLETED, UIOrderStatus.CANCELLED],
+      [UIOrderStatus.READY_TO_SHIP]: [UIOrderStatus.SHIPPED, UIOrderStatus.CANCELLED],
+      [UIOrderStatus.SHIPPED]: [UIOrderStatus.DELIVERED, UIOrderStatus.COMPLETED, UIOrderStatus.CANCELLED],
       [UIOrderStatus.DELIVERED]: [UIOrderStatus.REFUNDED],
+      [UIOrderStatus.COMPLETED]: [],
       [UIOrderStatus.CANCELLED]: [],
       [UIOrderStatus.REFUNDED]: [],
     }

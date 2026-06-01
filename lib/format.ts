@@ -44,10 +44,14 @@ export function formatDateTime(date: Date | string): string {
 export function formatOrderStatus(status: UIOrderStatus): string {
   const statusMap: Record<UIOrderStatus, string> = {
     WAITING_PAYMENT: 'Waiting for Payment',
+    MANUAL_REVIEW: 'Manual Review',
     PAYMENT_RECEIVED: 'Payment Received',
     PROCESSING: 'Processing',
+    READY_FOR_PICKUP: 'Ready for Pickup',
+    READY_TO_SHIP: 'Ready to Ship',
     SHIPPED: 'Shipped',
     DELIVERED: 'Delivered',
+    COMPLETED: 'Completed',
     CANCELLED: 'Cancelled',
     REFUNDED: 'Refunded',
   }
@@ -59,12 +63,14 @@ export function formatOrderStatus(status: UIOrderStatus): string {
  */
 export function formatPaymentStatus(status: UIPaymentStatus): string {
   const statusMap: Record<UIPaymentStatus, string> = {
+    WAITING: 'Waiting',
     PENDING: 'Pending',
     AUTHORIZED: 'Authorized',
     CAPTURED: 'Captured',
     SETTLED: 'Settled',
-    EXPIRED: 'Expired',
+    SUCCESS: 'Success',
     FAILED: 'Failed',
+    EXPIRED: 'Expired',
     CANCELLED: 'Cancelled',
     REFUNDED: 'Refunded',
   }
@@ -77,10 +83,14 @@ export function formatPaymentStatus(status: UIPaymentStatus): string {
 export function getOrderStatusColor(status: UIOrderStatus): string {
   const colorMap: Record<UIOrderStatus, string> = {
     WAITING_PAYMENT: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+    MANUAL_REVIEW: 'bg-amber-100 text-amber-800 border-amber-300',
     PAYMENT_RECEIVED: 'bg-blue-100 text-blue-800 border-blue-300',
     PROCESSING: 'bg-blue-100 text-blue-800 border-blue-300',
+    READY_FOR_PICKUP: 'bg-purple-100 text-purple-800 border-purple-300',
+    READY_TO_SHIP: 'bg-purple-100 text-purple-800 border-purple-300',
     SHIPPED: 'bg-purple-100 text-purple-800 border-purple-300',
     DELIVERED: 'bg-green-100 text-green-800 border-green-300',
+    COMPLETED: 'bg-green-100 text-green-800 border-green-300',
     CANCELLED: 'bg-red-100 text-red-800 border-red-300',
     REFUNDED: 'bg-gray-100 text-gray-800 border-gray-300',
   }
@@ -92,12 +102,14 @@ export function getOrderStatusColor(status: UIOrderStatus): string {
  */
 export function getPaymentStatusColor(status: UIPaymentStatus): string {
   const colorMap: Record<UIPaymentStatus, string> = {
+    WAITING: 'bg-yellow-100 text-yellow-800 border-yellow-300',
     PENDING: 'bg-yellow-100 text-yellow-800 border-yellow-300',
     AUTHORIZED: 'bg-blue-100 text-blue-800 border-blue-300',
     CAPTURED: 'bg-indigo-100 text-indigo-800 border-indigo-300',
     SETTLED: 'bg-green-100 text-green-800 border-green-300',
-    EXPIRED: 'bg-gray-100 text-gray-800 border-gray-300',
+    SUCCESS: 'bg-green-100 text-green-800 border-green-300',
     FAILED: 'bg-red-100 text-red-800 border-red-300',
+    EXPIRED: 'bg-red-100 text-red-800 border-red-300',
     CANCELLED: 'bg-red-100 text-red-800 border-red-300',
     REFUNDED: 'bg-gray-100 text-gray-800 border-gray-300',
   }
