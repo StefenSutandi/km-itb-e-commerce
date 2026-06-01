@@ -73,8 +73,10 @@ export class ProductRepository {
 
       if (!product) return null
 
-      // Don't leak drafts to the frontend
-      if (product.status === ProductStatus.DRAFT) return null
+      // Don't leak drafts or archived products to the frontend
+      if (product.status === ProductStatus.DRAFT || product.status === ProductStatus.ARCHIVED) {
+        return null
+      }
 
       return mapPrismaProductToUIProduct(product)
     } catch (error) {

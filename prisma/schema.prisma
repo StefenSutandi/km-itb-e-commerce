@@ -157,6 +157,7 @@ enum ProductStatus {
   READY_STOCK
   SOLD_OUT
   POP_UP_ONLY
+  ARCHIVED
 }
 
 enum ProductCategory {
