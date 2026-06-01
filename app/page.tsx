@@ -1,11 +1,17 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { productRepository, isMockFallbackAllowed } from '@/lib/repositories/product.repository'
 import { mockProducts } from '@/lib/mock-data'
 import { formatCurrency } from '@/lib/format'
 
-export default function HomePage() {
-  const featuredProducts = mockProducts.slice(0, 3)
+export default async function HomePage() {
+  let featuredProducts = await productRepository.getFeaturedProducts(3)
+  
+  // Temporary fallback if DB is empty, only if allowed
+  if (featuredProducts.length === 0 && isMockFallbackAllowed()) {
+    featuredProducts = mockProducts.slice(0, 3)
+  }
 
   return (
     <>
