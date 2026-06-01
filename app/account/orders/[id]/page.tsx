@@ -5,6 +5,7 @@ import { auth } from '@/auth'
 import { orderRepository } from '@/lib/repositories/order.repository'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { MidtransPayButton } from '@/components/payment/midtrans-pay-button'
 
 export const metadata = {
   title: 'Order Detail | KM ITB Merchandise',
@@ -41,9 +42,17 @@ export default async function OrderDetailPage({ params }: { params: { id: string
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12 md:py-20">
         <div className="space-y-8">
-          <div>
-            <h1 className="text-4xl font-light">Order {order.orderNumber}</h1>
-            <p className="text-gray-600 mt-2">{formatDate(order.createdAt)}</p>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-4xl font-light">Order {order.orderNumber}</h1>
+              <p className="text-gray-600 mt-2">{formatDate(order.createdAt)}</p>
+            </div>
+            {order.status === 'WAITING_PAYMENT' && (
+              <MidtransPayButton 
+                orderId={order.id} 
+                existingRedirectUrl={firstPayment?.snapRedirectUrl} 
+              />
+            )}
           </div>
 
           {/* Status Cards */}

@@ -255,6 +255,8 @@ model PaymentTransaction {
   status          PaymentStatus @default(WAITING)
   amount          Decimal  @db.Decimal(12, 2)
   paymentType     String?
+  snapToken       String?
+  snapRedirectUrl String?
   rawResponse     Json?
   paidAt          DateTime?
   createdAt       DateTime @default(now())
