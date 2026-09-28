@@ -1,54 +1,46 @@
-import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
-import { Navbar } from '@/components/navbar'
-import { Footer } from '@/components/footer'
-import './globals.css'
+import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+import "./globals.css";
 
 export const viewport: Viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#000000' },
-  ],
-}
-
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+  themeColor: "#010102",
+};
 
 export const metadata: Metadata = {
-  title: 'KM ITB Official Merchandise | Premium College Apparel',
-  description: 'Shop exclusive KM ITB official merchandise. Premium quality hoodies, t-shirts, and accessories for the ITB community.',
-  keywords: ['KM ITB', 'merchandise', 'apparel', 'hoodies', 'college'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  title: "KKP ITB | Koperasi kita.",
+  description:
+    "Kenali layanan Koperasi Keluarga Pegawai ITB: waserda, simpan pinjam, kantin, serta rental dan travel.",
+  keywords: ["KKP ITB", "koperasi", "waserda", "simpan pinjam", "ITB"],
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  ),
   openGraph: {
-    title: 'KM ITB Official Merchandise',
-    description: 'Premium college apparel for the ITB community',
-    type: 'website',
+    title: "KKP ITB | Koperasi kita.",
+    description: "Beragam layanan koperasi, satu pintu masuk.",
+    type: "website",
   },
   icons: {
-    icon: '/icon.svg',
+    icon: "/icon.svg",
   },
-}
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-background">
+    <html lang="id" className="bg-background">
       <body className="font-sans antialiased flex flex-col min-h-screen">
         <Navbar />
-        <main className="flex-1">
-          {children}
-        </main>
+        <main className="flex-1">{children}</main>
         <Footer />
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
     </html>
-  )
+  );
 }
