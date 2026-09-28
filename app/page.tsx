@@ -1,134 +1,145 @@
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { productRepository, isMockFallbackAllowed } from '@/lib/repositories/product.repository'
-import { mockProducts } from '@/lib/mock-data'
-import { formatCurrency } from '@/lib/format'
+import Link from "next/link";
+import {
+  ArrowDown,
+  ArrowUpRight,
+  Check,
+  Layers3,
+  MousePointer2,
+  Route,
+  ShieldCheck,
+} from "lucide-react";
+import { ServiceExplorer } from "@/components/service-explorer";
+import "./portal.css";
 
-export default async function HomePage() {
-  let featuredProducts = await productRepository.getFeaturedProducts(3)
-  
-  // Temporary fallback if DB is empty, only if allowed
-  if (featuredProducts.length === 0 && isMockFallbackAllowed()) {
-    featuredProducts = mockProducts.slice(0, 3)
-  }
-
+export default function HomePage() {
   return (
-    <>
-      {/* Hero Section */}
-      <section className="min-h-screen bg-black text-white flex flex-col justify-center px-4 md:px-8 py-20 md:py-0">
-        <div className="max-w-6xl mx-auto w-full">
-          <div className="space-y-8">
-            <h1 className="text-4xl md:text-7xl font-light leading-tight text-balance">
-              KM ITB Official Merchandise
-            </h1>
-            <p className="text-lg md:text-xl text-gray-300 max-w-2xl leading-relaxed">
-              Premium quality apparel and accessories for the ITB community. Wear your pride with our exclusive collection.
+    <div className="kkp-portal">
+      <section className="portal-hero portal-container">
+        <a className="hero-note" href="#layanan">
+          <span className="note-dot" /> Koperasi Keluarga Pegawai ITB{" "}
+          <ArrowUpRight size={14} />
+        </a>
+        <h1>
+          Dekat dengan keseharian.
+          <br />
+          <span>Terhubung dalam satu koperasi.</span>
+        </h1>
+        <div className="hero-bottom">
+          <p>
+            Dari kebutuhan harian sampai rencana perjalanan.
+            <br className="desktop-break" /> Temukan layanan KKP ITB, mulai dari
+            satu tempat.
+          </p>
+          <a className="portal-button primary" href="#layanan">
+            Jelajahi layanan <ArrowDown size={16} />
+          </a>
+        </div>
+        <ServiceExplorer />
+        <div className="unit-index">
+          <span>SATU KOPERASI, EMPAT UNIT USAHA</span>
+          <p>
+            Simpan pinjam <i /> Waserda <i /> Kantin <i /> Rental & travel
+          </p>
+        </div>
+      </section>
+
+      <section className="portal-section portal-container" id="cara-akses">
+        <div className="section-intro">
+          <span className="eyebrow">01 / LEBIH MUDAH DIAKSES</span>
+          <h2>
+            Mulai dari yang
+            <br />
+            Anda butuhkan.
+          </h2>
+          <p>
+            Setiap unit punya kebutuhan berbeda. Pilih layanan, lihat
+            keterangannya, lalu lanjutkan sesuai kebutuhan Anda.
+          </p>
+        </div>
+        <div className="steps-grid">
+          <article>
+            <MousePointer2 />
+            <span className="step-number">01</span>
+            <h3>Pilih unit usaha</h3>
+            <p>
+              Belanja, simpan pinjam, makan siang, atau perjalanan. Semuanya
+              mudah ditemukan.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/products">
-                <Button
-                  size="lg"
-                  className="w-full sm:w-auto rounded-full bg-accent hover:bg-accent text-black font-semibold px-8 py-6"
-                >
-                  Shop Now
-                </Button>
-              </Link>
-              <Link href="#featured">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="w-full sm:w-auto rounded-full border-white text-white hover:bg-white/10 font-semibold px-8 py-6"
-                >
-                  View Collection
-                </Button>
-              </Link>
-            </div>
-          </div>
+          </article>
+          <article>
+            <Route />
+            <span className="step-number">02</span>
+            <h3>Kenali layanannya</h3>
+            <p>Lihat cakupan layanan dan lokasi unit sebelum melanjutkan.</p>
+          </article>
+          <article>
+            <ShieldCheck />
+            <span className="step-number">03</span>
+            <h3>Lanjut dengan jelas</h3>
+            <p>
+              Akses katalog yang tersedia. Layanan yang masih disiapkan ditandai
+              secara terbuka.
+            </p>
+          </article>
         </div>
       </section>
 
-      {/* Featured Products Section */}
-      <section id="featured" className="bg-white py-16 md:py-24 px-4 md:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="space-y-12">
-            <div className="text-center space-y-4">
-              <h2 className="text-3xl md:text-5xl font-light">Featured Collection</h2>
-              <p className="text-gray-600 text-lg">Explore our most popular items</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-              {featuredProducts.map((product) => (
-                <Link key={product.id} href={`/products/${product.slug}`}>
-                  <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow border-gray-200">
-                    <div className="aspect-square bg-gray-200 overflow-hidden">
-                      <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="p-6 space-y-4">
-                      <div className="space-y-2">
-                        <h3 className="text-lg font-semibold leading-tight">{product.name}</h3>
-                        <p className="text-gray-600 text-sm line-clamp-2">{product.description}</p>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xl font-semibold text-black">
-                          {formatCurrency(product.price)}
-                        </span>
-                        <Button
-                          size="sm"
-                          className="rounded-full bg-accent hover:bg-accent text-black font-medium"
-                        >
-                          View
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-
-            <div className="text-center pt-4">
-              <Link href="/products">
-                <Button
-                  variant="outline"
-                  className="rounded-full border-black text-black hover:bg-black hover:text-white font-semibold px-8 py-6"
-                >
-                  View All Products
-                </Button>
-              </Link>
-            </div>
-          </div>
+      <section
+        className="portal-section portal-container about-section"
+        id="tentang"
+      >
+        <div>
+          <span className="eyebrow">02 / TUMBUH BERSAMA</span>
+          <h2>
+            Koperasi yang mengikuti
+            <br />
+            ritme keseharian kita.
+          </h2>
+          <p>
+            KKP ITB hadir melalui beragam unit usaha di lingkungan kampus.
+            Portal ini menjadi langkah awal untuk mempertemukan layanan-layanan
+            tersebut dalam pengalaman yang lebih sederhana.
+          </p>
+          <a className="text-link" href="#layanan">
+            Kenali unit usaha <ArrowUpRight size={16} />
+          </a>
+        </div>
+        <div className="principles">
+          <Layers3 size={28} />
+          <h3>
+            Beragam layanan.
+            <br />
+            Satu pintu masuk.
+          </h3>
+          <ul>
+            <li>
+              <Check size={16} /> Pilihan unit yang mudah dikenali
+            </li>
+            <li>
+              <Check size={16} /> Informasi lokasi dalam satu tampilan
+            </li>
+            <li>
+              <Check size={16} /> Pengembangan bertahap sesuai kebutuhan
+            </li>
+          </ul>
+          <span>Dirancang untuk keluarga besar ITB.</span>
         </div>
       </section>
 
-      {/* Info Section */}
-      <section className="bg-gray-50 py-16 md:py-24 px-4 md:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-            <div className="text-center space-y-3">
-              <h3 className="text-xl font-semibold">Premium Quality</h3>
-              <p className="text-gray-600">
-                Crafted from the finest materials for comfort and durability
-              </p>
-            </div>
-            <div className="text-center space-y-3">
-              <h3 className="text-xl font-semibold">Fast Delivery</h3>
-              <p className="text-gray-600">
-                Same-day pickup or reliable delivery to your doorstep
-              </p>
-            </div>
-            <div className="text-center space-y-3">
-              <h3 className="text-xl font-semibold">Official Design</h3>
-              <p className="text-gray-600">
-                Authentic KM ITB designs you won&apos;t find anywhere else
-              </p>
-            </div>
-          </div>
+      <section className="portal-container help-section" id="bantuan">
+        <div>
+          <span className="eyebrow">BUTUH ARAH?</span>
+          <h2>Kebutuhan Anda, mulai di sini.</h2>
+          <p>
+            Pilih unit di atas untuk melihat informasi layanan. Untuk ketentuan
+            layanan yang belum tersedia online, hubungi pengelola unit secara
+            langsung.
+          </p>
         </div>
+        <Link className="portal-button secondary" href="/products">
+          Buka katalog toko <ArrowUpRight size={16} />
+        </Link>
       </section>
-    </>
-  )
+    </div>
+  );
 }

@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -16,9 +16,9 @@
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: #A8E6CF;
+  --accent: #a8e6cf;
   --accent-foreground: oklch(0.145 0 0);
-  --accent-secondary: #C7F0D8;
+  --accent-secondary: #c7f0d8;
   --accent-secondary-foreground: oklch(0.145 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
@@ -77,8 +77,8 @@
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback";
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -126,5 +126,221 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Shared KKP portal chrome; transactional pages retain their existing surfaces. */
+.kkp-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #010102;
+  color: #f7f8f8;
+  border-bottom: 1px solid #23252a;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.kkp-nav-inner {
+  max-width: 1200px;
+  padding: 0 40px;
+  margin: auto;
+  height: 68px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+.kkp-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+.kkp-mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: #5e6ad2;
+  color: #fff;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 600;
+}
+.kkp-mark > span {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #c4caff;
+  bottom: 5px;
+  right: 4px;
+  border-radius: 50%;
+}
+.brand-divider {
+  height: 16px;
+  width: 1px;
+  background: #33363d;
+  margin: 0 4px;
+}
+.kkp-wordmark small {
+  font-size: 10px;
+  font-weight: 400;
+  color: #8a8f98;
+  letter-spacing: 0;
+}
+.kkp-desktop-links {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  font-size: 11px;
+  color: #aaaeb8;
+}
+.kkp-desktop-links a:hover,
+.kkp-footer a:hover {
+  color: #fff;
+}
+.kkp-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.kkp-nav-actions button {
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  min-height: 40px;
+}
+.kkp-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 11px;
+  border: 1px solid #33353b;
+  background: #151619;
+  border-radius: 7px;
+  min-height: 36px;
+  padding: 8px 13px;
+}
+.kkp-login:hover {
+  background: #25272e;
+}
+.kkp-nav-actions .kkp-menu-toggle {
+  display: none;
+}
+.kkp-mobile-links {
+  padding: 12px 20px 20px;
+  border-top: 1px solid #23252a;
+}
+.kkp-mobile-links a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 44px;
+  font-size: 13px;
+  color: #d0d6e0;
+}
+.kkp-nav a:focus-visible,
+.kkp-nav button:focus-visible,
+.kkp-footer a:focus-visible {
+  outline: 2px solid #828fff;
+  outline-offset: 4px;
+}
+.kkp-footer {
+  background: #010102;
+  color: #f7f8f8;
+  border-top: 1px solid #23252a;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.kkp-footer-inner,
+.kkp-footer-bottom {
+  max-width: 1120px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+.kkp-footer-inner {
+  padding: 40px 0;
+}
+.kkp-footer-inner p {
+  font-size: 11px;
+  color: #a2a7b2;
+  margin-top: 14px;
+}
+.kkp-footer-inner small {
+  font-size: 10px;
+  color: #858b97;
+}
+.kkp-footer-links {
+  display: flex;
+  gap: 30px;
+  padding-top: 8px;
+  font-size: 11px;
+  color: #a2a7b2;
+}
+.kkp-footer-bottom {
+  border-top: 1px solid #23252a;
+  padding: 20px 0 26px;
+  color: #858b97;
+  font-size: 9px;
+}
+@media (max-width: 1200px) {
+  .kkp-footer-inner,
+  .kkp-footer-bottom {
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+}
+@media (max-width: 900px) {
+  .kkp-wordmark small,
+  .brand-divider {
+    display: none;
+  }
+  .kkp-nav-inner {
+    padding: 0 24px;
+  }
+  .kkp-desktop-links {
+    gap: 18px;
+  }
+}
+@media (max-width: 640px) {
+  .kkp-nav-inner {
+    height: 62px;
+    padding: 0 20px;
+    gap: 12px;
+  }
+  .kkp-desktop-links {
+    display: none;
+  }
+  .kkp-nav-actions .kkp-menu-toggle {
+    display: grid;
+  }
+  .kkp-nav-actions {
+    gap: 10px;
+  }
+  .kkp-login {
+    min-height: 44px;
+  }
+  .kkp-footer-inner,
+  .kkp-footer-bottom {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+  .kkp-footer-inner {
+    flex-direction: column;
+    padding: 30px 0;
+  }
+  .kkp-footer-links {
+    gap: 24px;
+  }
+  .kkp-nav-actions > a:not(.kkp-login) {
+    min-height: 44px;
+    display: grid;
+    place-items: center;
   }
 }
